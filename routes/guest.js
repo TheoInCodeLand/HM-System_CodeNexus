@@ -160,7 +160,7 @@ router.get('/tips-archive', (req, res) => {
         res.render('guest/tips_archive', { // Assumes you create views/guest/tips_archive.ejs
             title: 'Tips Archive',
             user: req.session.user,
-            tips: tips
+            tips: tips // Pass the fetched tips array to the view
         });
     });
 });

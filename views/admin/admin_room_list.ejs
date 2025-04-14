@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
+        th { background-color: #f2f2f2; }
+        .actions form { display: inline-block; margin-right: 5px; margin-bottom: 5px; }
+        .actions button, .actions select { padding: 5px 8px; font-size: 0.9em;}
+        .checkin-form input[type="number"] { width: 60px; margin-right: 5px; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-success { background-color: #dff0d8; border: 1px solid #d6e9c6; color: #3c763d; }
+        .alert-error { background-color: #f2dede; border: 1px solid #ebccd1; color: #a94442; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p><a href="/admin/rooms/add">Add New Room</a></p>
+
+    <% if (locals.query) { %>
+        <% if (query.status === 'added_success') { %>
+            <div class="alert alert-success">New room added successfully.</div>
+        <% } else if (query.update_status === 'success') { %>
+            <div class="alert alert-success">Room status updated successfully.</div>
+        <% } else if (query.checkin_status === 'success') { %>
+            <div class="alert alert-success">Room checked in successfully.</div>
+        <% } else if (query.checkout_status === 'success') { %>
+            <div class="alert alert-success">Room checked out successfully. Status set to needs_cleaning.</div>
+        <% } else if (query.update_status || query.checkin_status || query.checkout_status || query.status === 'error') { %>
+            <div class="alert alert-error">Error: <%= query.message || 'Operation failed. Please check logs or input.' %></div>
+        <% } %>
+    <% } %>
+
+
+    <% if (rooms && rooms.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Room Number</th>
+                    <th>Current Status</th>
+                    <th>Guest Username (if occupied)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% rooms.forEach(room => { %>
+                    <tr>
+                        <td><%= room.room_number %></td>
+                        <td><%= room.status %></td>
+                        <td><%= (room.status === 'occupied' && room.guest_username) ? room.guest_username : '-' %></td>
+                        <td class="actions">
+                            <form action="/admin/rooms/status/<%= room.id %>" method="POST" style="display: inline-block;">
+                                <select name="new_status" required>
+                                    <% allowedStatuses.forEach(statusOption => { %>
+                                        <option value="<%= statusOption %>" <%= room.status === statusOption ? 'selected' : '' %>>
+                                            Set to: <%= statusOption %>
+                                        </option>
+                                    <% }); %>
+                                </select>
+                                <button type="submit">Update Status</button>
+                            </form>
+
+                            <hr style="margin: 5px 0;">
+
+                            <% if (room.status === 'available') { %>
+                                <form action="/admin/checkin/<%= room.id %>" method="POST" class="checkin-form" style="display: inline-block;">
+                                     <label for="guest_user_id_<%= room.id %>" style="font-size: 0.9em;">Guest User ID (Optional):</label>
+                                     <input type="number" id="guest_user_id_<%= room.id %>" name="guest_user_id" placeholder="ID">
+                                    <button type="submit">Check-in</button>
+                                </form>
+                             <% } %>
+
+                             <% if (room.status === 'occupied') { %>
+                                <form action="/admin/checkout/<%= room.id %>" method="POST" style="display: inline-block;">
+                                    <button type="submit">Check-out (Set to Needs Cleaning)</button>
+                                </form>
+                             <% } %>
+
+                             </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No rooms found. <a href="/admin/rooms/add">Add one?</a></p>
+    <% } %>
+
+     <p><a href="/admin/dashboard">Back to Admin Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

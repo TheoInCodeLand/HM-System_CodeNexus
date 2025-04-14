@@ -94,7 +94,7 @@ router.post('/login', (req, res) => {
                     case 'housekeeping':
                     case 'maintenance':
                     case 'kitchen':
-                        res.redirect('/staff/dashboard'); // Example generic staff dashboard route
+                        res.redirect('/housekeeping/dashboard'); // Example generic staff dashboard route
                         break;
                     default:
                         res.redirect('/');

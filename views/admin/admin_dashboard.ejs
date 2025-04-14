@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        .admin-section { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; }
+        .admin-section h2 { margin-top: 0; }
+        .admin-section ul { list-style: none; padding: 0; }
+        .admin-section li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Welcome, Admin <%= user.username %>.</p>
+
+    <div class="admin-section">
+        <h2>Management Areas</h2>
+        <ul>
+            <li><a href="/admin/rooms">Manage Rooms (Status, Check-in/out)</a></li>
+            <%# Add links to user management, settings, etc. here as needed %>
+        </ul>
+    </div>
+
+    <%# You could add summary statistics here later, e.g., room occupancy rates %>
+
+
+    <%- include('../partials/footer') %>
+</body>
+</html>
