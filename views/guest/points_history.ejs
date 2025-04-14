@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Here is a record of your green points and estimated carbon footprint over time.</p>
+
+    <% if (history && history.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Green Points</th>
+                    <th>Carbon Footprint Estimate</th>
+                    </tr>
+            </thead>
+            <tbody>
+                <% history.forEach(record => { %>
+                    <tr>
+                        <td><%= new Date(record.metric_time).toLocaleString() %></td>
+                        <td><%= record.green_points %></td>
+                        <td><%= record.carbon_footprint_estimate %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No points history found.</p>
+    <% } %>
+
+    <p><a href="/guest/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

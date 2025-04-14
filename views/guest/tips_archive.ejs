@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .tip-item { margin-bottom: 15px; padding: 10px; border: 1px solid #eee; border-radius: 4px; }
+        .tip-item strong { display: block; margin-bottom: 5px; color: #555; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Explore our collection of sustainability tips.</p>
+
+    <% if (tips && tips.length > 0) { %>
+        <div>
+            <% tips.forEach(tip => { %>
+                <div class="tip-item">
+                    <strong>Category: <%= tip.category || 'General' %></strong>
+                    <p><%= tip.content %></p>
+                    <small>Added: <%= new Date(tip.created_at).toLocaleDateString() %></small>
+                </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <p>No tips available in the archive.</p>
+    <% } %>
+
+     <p><a href="/guest/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

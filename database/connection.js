@@ -5,4 +5,6 @@ const db = new sqlite3.Database('./database/Hotel.db', (err)=> {
     } else {
         console.log('Connected to the hotel database.');
     }
-})
+});
+
+module.exports = db;

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><% title %></title>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Tfokomala</h1>
+        <p>Your comfort is our priority</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/rooms">Rooms</a></li>
+            <li><a href="/services">Services</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/register">Sign-in</a></li>
+            <li><a href="/auth/logout">Sign-out</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section>
+            <h2>Book Your Stay</h2>
+            <form action="/book" method="POST">
+                <label for="checkin">Check-in Date:</label>
+                <input type="date" id="checkin" name="checkin" required>
+                
+                <label for="checkout">Check-out Date:</label>
+                <input type="date" id="checkout" name="checkout" required>
+                
+                <label for="guests">Number of Guests:</label>
+                <input type="number" id="guests" name="guests" min="1" required>
+                
+                <button type="submit">Book Now</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Why Choose Us?</h2>
+            <ul>
+                <li>Luxurious Rooms</li>
+                <li>24/7 Customer Support</li>
+                <li>World-Class Amenities</li>
+                <li>Prime Locations</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; <%= new Date().getFullYear() %> Tfokomala. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

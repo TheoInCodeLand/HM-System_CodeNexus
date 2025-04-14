@@ -1,0 +1,38 @@
+<% // views/partials/header.ejs %>
+<header>
+    <nav>
+        <a href="/">Hotel Sustainability Hub</a>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <% if (locals.user) { %>
+                <%# User is logged in %>
+                <li><span>Welcome, <%= user.username %> (<%= user.role %>)</span></li>
+
+                <%# Role-specific dashboard links %>
+                <% if (user.role === 'guest') { %>
+                    <li><a href="/guest/dashboard">My Dashboard</a></li>
+                <% } else if (['housekeeping', 'maintenance', 'kitchen', 'admin'].includes(user.role)) { %>
+                    <li><a href="/staff/dashboard">Staff Dashboard</a></li> <%# Assuming a generic staff dashboard route %>
+                <% } %>
+
+                <li><a href="/logout">Logout</a></li>
+            <% } else { %>
+                <%# User is logged out %>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            <% } %>
+        </ul>
+    </nav>
+    <hr> <%# Simple separator %>
+</header>
+
+<%# Basic Styling (Move to your CSS file ideally) %>
+<style>
+    header { background-color: #f8f8f8; padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+    nav { width: 90%; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    nav a { text-decoration: none; color: #337ab7; margin-right: 15px; }
+    nav a:hover { text-decoration: underline; }
+    nav ul { list-style: none; padding: 0; margin: 0; display: flex; align-items: center; }
+    nav ul li { margin-left: 15px; }
+    nav ul li span { color: #555; }
+</style>
