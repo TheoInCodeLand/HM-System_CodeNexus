@@ -1,4 +1,4 @@
-<% // views/partials/header.ejs %>
+
 <header>
     <nav>
         <a href="/">Hotel Sustainability Hub</a>
@@ -15,7 +15,7 @@
                     <li><a href="/staff/dashboard">Staff Dashboard</a></li> <%# Assuming a generic staff dashboard route %>
                 <% } %>
 
-                <li><a href="/logout">Logout</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
             <% } else { %>
                 <%# User is logged out %>
                 <li><a href="/login">Login</a></li>

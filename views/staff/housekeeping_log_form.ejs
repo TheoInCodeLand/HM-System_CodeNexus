@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="checkbox"], textarea { margin-right: 5px; }
+        textarea { width: 80%; min-height: 60px; padding: 5px; }
+        button { padding: 10px 15px; background-color: #337ab7; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #286090; }
+        .preference-note { font-style: italic; color: #666; margin-left: 5px; }
+    </style>
+</head>
+<body>
+     <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+
+    <form action="/housekeeping/log" method="POST">
+        <input type="hidden" name="room_id" value="<%= room.id %>">
+
+        <div class="form-group">
+             <label>
+                <input type="checkbox" name="linen_changed" value="on" <%= (preference && preference.opt_out_linen_change) ? 'disabled' : '' %>> Linen Changed
+                <% if (preference && preference.opt_out_linen_change) { %>
+                    <span class="preference-note">(Guest opted out)</span>
+                <% } %>
+             </label>
+        </div>
+
+         <div class="form-group">
+             <label>
+                 <input type="checkbox" name="towels_changed" value="on" <%= (preference && preference.opt_out_linen_change) ? 'disabled' : '' %>> Towels Changed
+                 <% if (preference && preference.opt_out_linen_change) { %>
+                    <span class="preference-note">(Guest opted out)</span>
+                <% } %>
+             </label>
+        </div>
+
+        <div class="form-group">
+            <label for="waste_reported">Waste Reported (Optional):</label>
+            <textarea id="waste_reported" name="waste_reported" placeholder="e.g., Excessive recycling, misplaced compost"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="damage_reported">Damage Reported (Optional):</label>
+            <textarea id="damage_reported" name="damage_reported" placeholder="e.g., Leaky faucet, broken lamp"></textarea>
+        </div>
+
+        <button type="submit">Submit Log</button>
+    </form>
+
+    <p><a href="/housekeeping/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .form-container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold;}
+        input[type="text"], input[type="date"], input[type="number"], textarea, select {
+            width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+        }
+        textarea { min-height: 80px; }
+        button { padding: 10px 15px; background-color: #5cb85c; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;}
+        button:hover { background-color: #4cae4c; }
+        button[type="button"] { background-color: #aaa; }
+        button[type="button"]:hover { background-color: #999; }
+         .alert-error { color: red; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <div class="form-container">
+        <h1><%= title %></h1>
+
+        <%# Display error messages if redirected back %>
+         <% if (locals.query && query.status === 'error') { %>
+            <p class="alert-error">Error: <%= query.message || 'Please check your input.' %></p>
+        <% } %>
+
+        <%# The form action is dynamic based on whether adding or editing %>
+        <form action="<%= form_action %>" method="POST">
+
+            <div class="form-group">
+                <label for="name">Equipment Name:</label>
+                <input type="text" id="name" name="name" required value="<%= equipment ? equipment.name : '' %>">
+            </div>
+
+            <div class="form-group">
+                <label for="asset_tag">Asset Tag (Unique):</label>
+                <input type="text" id="asset_tag" name="asset_tag" value="<%= equipment ? equipment.asset_tag : '' %>">
+            </div>
+
+            <div class="form-group">
+                <label for="location_description">Location Description (if not in a specific room):</label>
+                <input type="text" id="location_description" name="location_description" placeholder="e.g., Roof, Basement" value="<%= equipment ? equipment.location_description : '' %>">
+            </div>
+
+             <div class="form-group">
+                <label for="location_room_id">Location Room (Optional):</label>
+                <select id="location_room_id" name="location_room_id">
+                    <option value="">-- Select Room --</option>
+                     <% if (locals.rooms && rooms.length > 0) { %>
+                         <% rooms.forEach(room => { %>
+                             <option value="<%= room.id %>" <%= (equipment && equipment.location_room_id == room.id) ? 'selected' : '' %>>
+                                 Room <%= room.room_number %>
+                             </option>
+                         <% }); %>
+                     <% } %>
+                </select>
+             </div>
+
+              <div class="form-group">
+                <label for="install_date">Install Date:</label>
+                <input type="date" id="install_date" name="install_date" value="<%= equipment && equipment.install_date ? new Date(equipment.install_date).toISOString().split('T')[0] : '' %>">
+            </div>
+
+             <div class="form-group">
+                <label for="last_service_date">Last Service Date:</label>
+                <input type="date" id="last_service_date" name="last_service_date" value="<%= equipment && equipment.last_service_date ? new Date(equipment.last_service_date).toISOString().split('T')[0] : '' %>">
+            </div>
+
+             <div class="form-group">
+                <label for="service_interval_days">Recommended Service Interval (Days):</label>
+                <input type="number" id="service_interval_days" name="service_interval_days" value="<%= equipment ? equipment.service_interval_days : '' %>">
+            </div>
+
+             <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea id="notes" name="notes"><%= equipment ? equipment.notes : '' %></textarea>
+            </div>
+
+            <button type="submit"><%= equipment ? 'Update Equipment' : 'Add Equipment' %></button>
+            <button type="button" onclick="window.location.href='/maintenance/equipment'">Cancel</button>
+
+        </form>
+    </div>
+
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

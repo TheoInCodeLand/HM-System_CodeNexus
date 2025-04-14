@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold;}
+        input[type="text"], input[type="number"], textarea, select {
+            width: 90%; max-width: 400px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+        }
+        textarea { min-height: 80px; }
+        button { padding: 10px 15px; background-color: #337ab7; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #286090; }
+        .conditional-field { display: none; /* Hidden by default */ }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+
+    <%# Display error messages if redirected back %>
+     <% if (locals.query && query.log_status === 'error') { %>
+        <p style="color: red;">Error: <%= query.message || 'Invalid input.' %></p>
+    <% } %>
+
+    <form action="/maintenance/log" method="POST">
+        <div class="form-group">
+            <label for="log_type">Log Type:</label>
+            <select id="log_type" name="log_type" required onchange="toggleFields()">
+                <option value="">-- Select Type --</option>
+                <option value="energy_reading">Energy Reading</option>
+                <option value="scheduled_check">Scheduled Check</option>
+                <option value="fault_report">Fault Report</option>
+                <option value="repair">Repair Log</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" required placeholder="Describe the task, reading, fault, or repair"></textarea>
+        </div>
+
+         <div class="form-group">
+             <label for="room_id">Room (Optional):</label>
+             <select id="room_id" name="room_id">
+                 <option value="">-- Select Room (if applicable) --</option>
+                 <% if (locals.rooms && rooms.length > 0) { %>
+                     <% rooms.forEach(room => { %>
+                         <option value="<%= room.id %>">Room <%= room.room_number %></option>
+                     <% }); %>
+                 <% } %>
+             </select>
+         </div>
+
+         <div class="form-group">
+            <label for="equipment_id">Equipment ID/Tag (Optional):</label>
+            <input type="text" id="equipment_id" name="equipment_id" placeholder="Enter Asset Tag or ID if applicable">
+             <%# Ideally, this would be a searchable dropdown linked to the equipment table %>
+        </div>
+
+        <div class="form-group conditional-field" id="energy_reading_field">
+            <label for="energy_reading">Energy Reading:</label>
+            <input type="number" step="0.01" id="energy_reading" name="energy_reading" placeholder="e.g., 123.45">
+            <%# Add units if needed (kWh, etc.) %>
+        </div>
+
+        <div class="form-group conditional-field" id="status_field">
+             <label for="status">Status (for Faults/Repairs):</label>
+             <select id="status" name="status">
+                 <option value="open">Open</option>
+                 <option value="in_progress">In Progress</option>
+                 <option value="resolved">Resolved</option>
+                 <option value="closed">Closed</option>
+             </select>
+        </div>
+
+
+        <button type="submit">Submit Log</button>
+    </form>
+
+     <p><a href="/maintenance/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        // Simple script to show/hide fields based on log type
+        function toggleFields() {
+            const logType = document.getElementById('log_type').value;
+            const energyField = document.getElementById('energy_reading_field');
+            const statusField = document.getElementById('status_field');
+
+            energyField.style.display = (logType === 'energy_reading') ? 'block' : 'none';
+            statusField.style.display = (logType === 'fault_report' || logType === 'repair') ? 'block' : 'none';
+
+            // Make energy reading required only when visible
+            document.getElementById('energy_reading').required = (logType === 'energy_reading');
+        }
+        // Run on page load in case of errors/reloads
+        toggleFields();
+    </script>
+</body>
+</html>

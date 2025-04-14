@@ -20,6 +20,7 @@
     "express-session": "^1.18.1",
     "hm-system_codenexus": "file:",
     "multer": "^1.4.5-lts.2",
+    "node-cron": "^3.0.3",
     "sqlite3": "^5.1.7"
   }
 }

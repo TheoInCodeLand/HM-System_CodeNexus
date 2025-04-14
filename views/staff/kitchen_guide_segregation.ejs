@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .guide-section { margin-bottom: 20px; padding: 15px; border-left: 4px solid #17a2b8; background-color: #f8f9fa; }
+        h2 { margin-top: 0; }
+        ul { padding-left: 20px; }
+     </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Proper waste segregation is crucial for recycling and composting efforts.</p>
+
+    <div class="guide-section">
+        <h2>General Principles</h2>
+        <ul>
+            <li><strong>Clean & Dry:</strong> Ensure recyclable materials (paper, plastic, cans) are clean and dry.</li>
+            <li><strong>Empty Containers:</strong> Empty food and liquid containers before recycling.</li>
+            <li><strong>Check Local Rules:</strong> Always refer to specific local guidelines as rules can vary.</li>
+            <li><strong>When in Doubt, Throw it Out:</strong> If unsure if an item is recyclable or compostable, put it in general waste to avoid contaminating batches.</li>
+        </ul>
+    </div>
+
+     <div class="guide-section" style="border-left-color: #28a745;">
+        <h2>Compostable (Organic Waste)</h2>
+        <ul>
+            <li>Fruit and vegetable scraps (peels, cores, cuttings)</li>
+            <li>Coffee grounds and paper filters</li>
+            <li>Tea bags (check for plastic/staples)</li>
+            <li>Eggshells</li>
+            <li>Spoiled leftovers (no meat, dairy, or oily foods - check local rules)</li>
+            <li>Paper napkins and towels (if not heavily soiled with chemicals)</li>
+            <li><b>DO NOT Compost:</b> Meat, bones, dairy, fats/oils, diseased plants, plastic-coated items.</li>
+        </ul>
+    </div>
+
+     <div class="guide-section" style="border-left-color: #007bff;">
+        <h2>Recyclable</h2>
+        <ul>
+            <li><b>Paper:</b> Newspapers, magazines, cardboard (flattened), office paper, junk mail.</li>
+            <li><b>Plastics:</b> Check for recycling symbols (numbers 1-7). Typically includes bottles (drinks, shampoo), jugs (milk), tubs (yogurt - check locally), some containers. Rinse clean.</li>
+            <li><b>Glass:</b> Bottles and jars (clear, brown, green). Rinse clean. Remove lids (recycle separately if metal).</li>
+            <li><b>Metal:</b> Aluminum cans (soda, beer), steel/tin cans (food). Rinse clean.</li>
+            <li><b>DO NOT Recycle:</b> Plastic bags/film (check store drop-off), styrofoam, ceramics, broken glass, greasy pizza boxes, food-soiled paper, disposable coffee cups (usually mixed materials).</li>
+        </ul>
+    </div>
+
+     <div class="guide-section" style="border-left-color: #6c757d;">
+        <h2>General Waste (Landfill)</h2>
+        <ul>
+            <li>Items that cannot be composted or recycled.</li>
+            <li>Plastic wrap, film, bags (unless specific local recycling exists).</li>
+            <li>Styrofoam packaging.</li>
+            <li>Food-soiled containers (unless specifically accepted for composting).</li>
+            <li>Broken ceramics or glass.</li>
+            <li>Disposable diapers.</li>
+            <li>Anything you are unsure about.</li>
+        </ul>
+    </div>
+
+     <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

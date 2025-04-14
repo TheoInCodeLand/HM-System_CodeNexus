@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>This page shows a history of logged scheduled checks. (A view of upcoming tasks would require additional logic based on last service dates and intervals).</p>
+
+    <% if (scheduleLogs && scheduleLogs.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Description</th>
+                    <th>Equipment Checked</th>
+                    <th>Performed By</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% scheduleLogs.forEach(log => { %>
+                    <tr>
+                        <td><%= new Date(log.log_time).toLocaleString() %></td>
+                        <td><%= log.description %></td>
+                        <td><%= log.equipment_name || (log.equipment_id ? `ID: ${log.equipment_id}` : 'N/A') %></td>
+                        <td><%= log.performed_by %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No scheduled checks found in the logs.</p>
+    <% } %>
+
+    <p><a href="/maintenance/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        .form-container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold;}
+        input[type="text"], input[type="number"], textarea, select {
+            width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+        }
+        textarea { min-height: 60px; }
+        button { padding: 10px 15px; background-color: #337ab7; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;}
+        button:hover { background-color: #286090; }
+        .alert-error { color: red; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+     <%- include('../partials/header', { user: user }) %>
+
+    <div class="form-container">
+        <h1><%= title %></h1>
+
+         <%# Display messages based on query parameters from redirects %>
+        <% if (locals.query && query.log_status === 'error') { %>
+            <p class="alert-error">Error: <%= query.message || 'Invalid input.' %></p>
+        <% } %>
+
+        <form action="/kitchen/waste/log" method="POST">
+             <div class="form-group">
+                <label for="waste_type">Waste Type:</label>
+                <select id="waste_type" name="waste_type" required>
+                    <option value="">-- Select Type --</option>
+                    <option value="prep_scrap">Preparation Scrap (Peels, Trimmings)</option>
+                    <option value="spoilage">Spoilage</option>
+                    <option value="plate_waste">Plate Waste (Post-consumer)</option>
+                    <option value="general">General Kitchen Waste</option>
+                </select>
+            </div>
+
+             <div class="form-group">
+                <label for="food_item">Food Item (if applicable):</label>
+                <input type="text" id="food_item" name="food_item" placeholder="e.g., Carrots, Bread Loaf">
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 2;">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" step="0.01" id="quantity" name="quantity" required placeholder="e.g., 1.5">
+                </div>
+                 <div style="flex: 1;">
+                    <label for="unit">Unit:</label>
+                     <input type="text" id="unit" name="unit" required placeholder="e.g., kg, items, liters">
+                </div>
+            </div>
+
+             <div class="form-group">
+                <label for="reason">Reason (Optional):</label>
+                <input type="text" id="reason" name="reason" placeholder="e.g., Expired, Over-preparation, Burnt">
+            </div>
+
+            <div class="form-group">
+                <label for="disposal_method">Disposal Method:</label>
+                <select id="disposal_method" name="disposal_method" required>
+                    <option value="">-- Select Disposal --</option>
+                    <option value="compost">Compost</option>
+                    <option value="donation">Donation</option>
+                    <option value="general_waste">General Waste</option>
+                     <option value="recycling">Recycling (e.g., packaging)</option>
+                </select>
+            </div>
+
+            <button type="submit">Log Waste</button>
+             <button type="button" onclick="window.location.href='/kitchen/dashboard'">Cancel</button>
+        </form>
+    </div>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

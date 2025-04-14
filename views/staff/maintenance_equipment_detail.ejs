@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h2, .detail-section h3 { margin-bottom: 10px; }
+        .detail-item { margin-bottom: 8px; }
+        .detail-item strong { display: inline-block; min-width: 150px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+         .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-success { background-color: #dff0d8; border: 1px solid #d6e9c6; color: #3c763d; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+     <p>
+        <a href="/maintenance/equipment">Back to Equipment List</a> |
+        <a href="/maintenance/equipment/edit/<%= equipment.id %>">Edit This Equipment</a>
+     </p>
+
+     <%# Display messages based on query parameters from redirects %>
+    <% if (locals.query && query.status === 'updated_success') { %>
+        <div class="alert alert-success">Equipment updated successfully.</div>
+    <% } %>
+
+    <div class="detail-section">
+        <h2>Equipment Details</h2>
+        <div class="detail-item"><strong>Name:</strong> <%= equipment.name %></div>
+        <div class="detail-item"><strong>Asset Tag:</strong> <%= equipment.asset_tag || '-' %></div>
+        <div class="detail-item"><strong>Location:</strong> <%= equipment.room_number ? `Room ${equipment.room_number}` : (equipment.location_description || '-') %></div>
+        <div class="detail-item"><strong>Install Date:</strong> <%= equipment.install_date ? new Date(equipment.install_date).toLocaleDateString() : '-' %></div>
+        <div class="detail-item"><strong>Last Service Date:</strong> <%= equipment.last_service_date ? new Date(equipment.last_service_date).toLocaleDateString() : '-' %></div>
+        <div class="detail-item"><strong>Service Interval:</strong> <%= equipment.service_interval_days ? `${equipment.service_interval_days} days` : '-' %></div>
+        <div class="detail-item"><strong>Notes:</strong></div>
+        <pre><%= equipment.notes || '-' %></pre>
+    </div>
+
+     <div class="detail-section">
+        <h2>Maintenance History</h2>
+         <% if (maintenanceHistory && maintenanceHistory.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Performed By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% maintenanceHistory.forEach(log => { %>
+                        <tr>
+                            <td><%= new Date(log.log_time).toLocaleString() %></td>
+                            <td><%= log.log_type %></td>
+                            <td><%= log.description %></td>
+                            <td><%= log.status || '-' %></td>
+                            <td><%= log.staff_username %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No maintenance history found for this equipment.</p>
+        <% } %>
+     </div>
+
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

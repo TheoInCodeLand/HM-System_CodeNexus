@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        .material-item { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .material-item h3 { margin-top: 0; }
+        .material-item a { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Access training resources relevant to kitchen operations and sustainability.</p>
+
+     <% if (materials && materials.length > 0) { %>
+        <% materials.forEach(material => { %>
+            <div class="material-item">
+                <h3><%= material.title %></h3>
+                <% if (material.description) { %><p><%= material.description %></p><% } %>
+                <% if (material.content_url) { %>
+                    <p><a href="<%= material.content_url %>" target="_blank" rel="noopener noreferrer">Access Material</a></p>
+                <% } else { %>
+                     <p><i>(No link provided)</i></p>
+                <% } %>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p>No training materials found.</p>
+    <% } %>
+
+     <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

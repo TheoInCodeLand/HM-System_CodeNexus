@@ -36,6 +36,10 @@ app.use(session({
 app.use('/', require('./routes/home'));
 app.use('/auth', require('./routes/auth'));
 app.use('/guest', require('./routes/guest'));
+app.use('/admin', require('./routes/admin'));
+app.use('/housekeeping', require('./routes/housekeeping'));
+app.use('/maintenance', require('./routes/maintenance'));
+app.use('/kitchen', require('./routes/kitchen'));
 
 app.use((req, res, next) => {
   res.status(404).render('error/404', { title: 'Page Not Found' });

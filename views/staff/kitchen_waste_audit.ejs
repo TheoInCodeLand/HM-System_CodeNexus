@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; max-width: 800px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %> (Last 7 Days)</h1>
+
+     <% if (auditData && auditData.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Waste Type</th>
+                    <th>Disposal Method</th>
+                    <th>Total Quantity</th>
+                    <th>Unit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% auditData.forEach(record => { %>
+                    <tr>
+                        <td><%= record.waste_type %></td>
+                        <td><%= record.disposal_method %></td>
+                        <td><%= record.total_quantity.toFixed(2) %></td> <%# Format to 2 decimal places %>
+                        <td><%= record.unit %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No waste data found for the last 7 days.</p>
+    <% } %>
+
+     <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

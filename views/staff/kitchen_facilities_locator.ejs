@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .facility-card { border: 1px solid #ccc; border-radius: 5px; padding: 15px; margin-bottom: 15px; background-color: #fff; }
+        .facility-card h3 { margin-top: 0; }
+        .facility-card p { margin-bottom: 5px; }
+        .facility-type { font-style: italic; color: #555; }
+        .accepted-materials { font-size: 0.9em; color: #333; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+
+    <% if (facilities && facilities.length > 0) { %>
+        <% facilities.forEach(facility => { %>
+            <div class="facility-card">
+                <h3><%= facility.facility_name %></h3>
+                <p class="facility-type">Type: <%= facility.facility_type %></p>
+                <% if (facility.address) { %><p><strong>Address:</strong> <%= facility.address %></p><% } %>
+                <% if (facility.contact_info) { %><p><strong>Contact:</strong> <%= facility.contact_info %></p><% } %>
+                <% if (facility.operating_hours) { %><p><strong>Hours:</strong> <%= facility.operating_hours %></p><% } %>
+                <% if (facility.accepted_materials) { %><div class="accepted-materials"><strong>Accepts:</strong> <%= facility.accepted_materials %></div><% } %>
+                <%# Add map link if latitude/longitude are available:
+                   e.g., <a href="https://www.google.com/maps/search/?api=1&query=<%= facility.latitude %>,<%= facility.longitude %>" target="_blank">View on Map</a>
+                %>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p>No nearby facilities found in the database.</p>
+    <% } %>
+
+    <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

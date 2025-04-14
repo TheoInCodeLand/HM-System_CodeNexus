@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        .section { margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 5px; }
+        .section h2 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .item-list li, .schedule-list li { margin-bottom: 5px; }
+        .near-expiry { color: orange; font-weight: bold; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-success { background-color: #dff0d8; border: 1px solid #d6e9c6; color: #3c763d; }
+        .alert-error { background-color: #f2dede; border: 1px solid #ebccd1; color: #a94442; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Welcome, <%= user.username %>.</p>
+
+     <%# Display messages based on query parameters from redirects %>
+    <% if (locals.query && query.log_status === 'waste_success') { %>
+        <div class="alert alert-success">Kitchen waste log submitted successfully.</div>
+    <% } %>
+
+    <div class="section">
+        <h2>Quick Actions & Links</h2>
+        <ul>
+            <li><a href="/kitchen/waste/log">Log Kitchen Waste</a></li>
+            <li><a href="/kitchen/waste/audit">View Waste Audit Summary</a></li>
+            <li><a href="/kitchen/inventory">Manage Inventory</a></li>
+            <li><a href="/kitchen/inventory/add">Add Inventory Item</a></li>
+            <li><a href="/kitchen/guides/segregation">Waste Segregation Guide</a></li>
+            <li><a href="/kitchen/guides/composting">Composting Guide</a></li>
+            <li><a href="/kitchen/facilities">Find Recycling/Composting Facilities</a></li>
+            <li><a href="/kitchen/recipes/scraps">Food Scrap Recipes</a></li>
+            <li><a href="/kitchen/training">View Training Materials</a></li>
+        </ul>
+    </div>
+
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+        <div class="section" style="flex: 1; min-width: 300px; margin: 10px;">
+            <h2>Inventory Nearing Expiry (FIFO Reminder)</h2>
+            <% if (nearExpiryItems && nearExpiryItems.length > 0) { %>
+                <ul class="item-list">
+                    <% nearExpiryItems.forEach(item => { %>
+                        <li class="near-expiry">
+                            <%= item.item_name %> (<%= item.quantity %> <%= item.unit %>) - Expires: <%= new Date(item.expiry_date).toLocaleDateString() %>
+                            - <a href="/kitchen/inventory#item-<%= item.id %>">View in Inventory</a> <%# Link needs adjustment based on inventory page structure %>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No items nearing expiry date found.</p>
+            <% } %>
+            <p><a href="/kitchen/inventory">Go to Full Inventory</a></p>
+        </div>
+
+        <div class="section" style="flex: 1; min-width: 300px; margin: 10px;">
+            <h2>Waste Collection Schedule</h2>
+            <% if (collectionSchedules && collectionSchedules.length > 0) { %>
+                 <ul class="schedule-list">
+                    <% collectionSchedules.forEach(schedule => { %>
+                        <li>
+                            <strong><%= schedule.waste_type %>:</strong> <%= schedule.collection_day %>
+                            <% if (schedule.collection_time) { %> at <%= schedule.collection_time %><% } %>
+                            <% if (schedule.next_collection_due) { %> (Next Due: ~<%= new Date(schedule.next_collection_due).toLocaleDateString() %>) <% } %>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No collection schedules defined.</p>
+            <% } %>
+        </div>
+    </div>
+
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

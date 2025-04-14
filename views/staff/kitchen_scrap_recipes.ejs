@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .recipe-idea { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .recipe-idea h3 { margin-top: 0; }
+        .recipe-idea ul { padding-left: 20px; }
+     </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Reduce waste by finding creative uses for common kitchen scraps!</p>
+
+    <%# Example recipe ideas - fetch these from DB or keep static %>
+    <div class="recipe-idea">
+        <h3>Vegetable Broth from Scraps</h3>
+        <ul>
+            <li><strong>Scraps to Use:</strong> Onion skins/ends, carrot peels/ends, celery ends/leaves, herb stems (parsley, cilantro), mushroom stems, leek tops.</li>
+            <li><strong>Avoid:</strong> Cruciferous veggies (broccoli, cabbage, cauliflower - can make broth bitter), starchy items (potato peels - can make broth cloudy).</li>
+            <li><strong>Method:</strong> Collect scraps in a bag in the freezer. When full, place in a large pot, cover with water, add peppercorns and a bay leaf. Simmer for 1-2 hours. Strain well. Use as a base for soups and sauces.</li>
+        </ul>
+    </div>
+
+     <div class="recipe-idea">
+        <h3>Citrus Peel Cleaner</h3>
+         <ul>
+            <li><strong>Scraps to Use:</strong> Orange, lemon, grapefruit peels.</li>
+            <li><strong>Method:</strong> Place peels in a jar and cover with white vinegar. Let sit for 1-2 weeks, shaking occasionally. Strain the liquid into a spray bottle. Dilute with water (1:1 ratio). Use as an all-purpose cleaner (test on surfaces first, avoid natural stone).</li>
+        </ul>
+    </div>
+
+     <div class="recipe-idea">
+        <h3>Stale Bread Croutons/Breadcrumbs</h3>
+         <ul>
+            <li><strong>Scraps to Use:</strong> Stale bread (baguette, loaf ends).</li>
+            <li><strong>Method (Croutons):</strong> Cut bread into cubes. Toss with olive oil, salt, pepper, herbs (optional). Bake at 180°C (350°F) until golden brown and crisp (10-15 mins).</li>
+             <li><strong>Method (Breadcrumbs):</strong> Toast bread slices until very dry. Break into pieces and process in a food processor until desired crumb size. Store in an airtight container.</li>
+        </ul>
+    </div>
+
+    <%# Add more ideas here %>
+
+
+     <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

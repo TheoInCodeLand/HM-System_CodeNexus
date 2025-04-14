@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        .section { margin-bottom: 20px; }
+        .fault-list li { margin-bottom: 5px; border-bottom: 1px dotted #eee; padding-bottom: 5px; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-success { background-color: #dff0d8; border: 1px solid #d6e9c6; color: #3c763d; }
+        .alert-error { background-color: #f2dede; border: 1px solid #ebccd1; color: #a94442; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Welcome, <%= user.username %>.</p>
+
+    <%# Display messages based on query parameters from redirects %>
+    <% if (locals.query && query.log_status === 'success') { %>
+        <div class="alert alert-success">Maintenance log submitted successfully.</div>
+    <% } else if (locals.query && query.log_status === 'error') { %>
+        <div class="alert alert-error">Error submitting maintenance log. <%= query.message ? `(${query.message})` : '' %></div>
+    <% } %>
+
+    <div class="section">
+        <h2>Quick Actions</h2>
+        <ul>
+            <li><a href="/maintenance/log">Log New Maintenance Task</a></li>
+            <li><a href="/maintenance/faults">View All Fault Reports</a></li>
+            <li><a href="/maintenance/equipment">View Equipment List</a></li>
+             <li><a href="/maintenance/equipment/add">Add New Equipment</a></li>
+            <li><a href="/maintenance/schedule">View Schedule Log</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Open Fault Reports</h2>
+        <% if (openFaults && openFaults.length > 0) { %>
+            <ul class="fault-list">
+                <% openFaults.forEach(fault => { %>
+                    <li>
+                        <strong><%= new Date(fault.log_time).toLocaleString() %>:</strong> <%= fault.description %>
+                        (Status: <%= fault.status %>, Room: <%= fault.room_id || 'N/A' %>, Equip: <%= fault.equipment_id || 'N/A' %>)
+                        - <a href="/maintenance/faults">Update Status</a> <%# Link to faults list where update happens %>
+                    </li>
+                <% }); %>
+            </ul>
+             <p><a href="/maintenance/faults">View All Faults</a></p>
+        <% } else { %>
+            <p>No open fault reports.</p>
+        <% } %>
+    </div>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

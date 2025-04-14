@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .low-stock { background-color: #f2dede; } /* Highlight low stock items */
+        .update-form { display: inline-flex; align-items: center; gap: 5px; }
+        .update-form input[type="number"] { width: 60px; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .alert-success { background-color: #dff0d8; border: 1px solid #d6e9c6; color: #3c763d; }
+        .alert-error { background-color: #f2dede; border: 1px solid #ebccd1; color: #a94442; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+
+    <%# Display messages based on query parameters from redirects %>
+    <% if (locals.query && query.update_status === 'success') { %>
+        <div class="alert alert-success">Supply stock updated successfully.</div>
+    <% } else if (locals.query && query.update_status === 'error') { %>
+        <div class="alert alert-error">Error updating supply: Invalid input.</div>
+    <% } else if (locals.query && query.update_status === 'db_error') { %>
+        <div class="alert alert-error">Error updating supply: Database error.</div>
+     <% } else if (locals.query && query.update_status === 'not_found') { %>
+        <div class="alert alert-error">Error updating supply: Item not found.</div>
+    <% } %>
+
+
+    <% if (supplies && supplies.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Current Stock</th>
+                    <th>Unit</th>
+                    <th>Reorder Level</th>
+                    <th>Last Updated</th>
+                    <th>Update Stock (+/-)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% supplies.forEach(item => { %>
+                    <tr class="<%= item.current_stock < item.reorder_level ? 'low-stock' : '' %>">
+                        <td><%= item.item_name %></td>
+                        <td><%= item.current_stock %></td>
+                        <td><%= item.unit %></td>
+                        <td><%= item.reorder_level %></td>
+                        <td><%= new Date(item.last_updated).toLocaleString() %></td>
+                        <td>
+                            <form action="/housekeeping/supplies/update" method="POST" class="update-form">
+                                <input type="hidden" name="supply_id" value="<%= item.id %>">
+                                <input type="number" name="change_amount" value="0" required>
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No supply items found. You may need to add some via database setup.</p>
+    <% } %>
+
+    <p><a href="/housekeeping/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

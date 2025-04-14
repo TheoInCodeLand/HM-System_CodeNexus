@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+        .form-container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold;}
+        input[type="text"], input[type="number"], input[type="date"], select {
+            width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+        }
+        button { padding: 10px 15px; background-color: #5cb85c; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;}
+        button:hover { background-color: #4cae4c; }
+        button[type="button"] { background-color: #aaa; }
+        button[type="button"]:hover { background-color: #999; }
+        .alert-error { color: red; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+     <div class="form-container">
+        <h1><%= title %></h1>
+
+        <%# Display messages based on query parameters from redirects %>
+         <% if (locals.query && query.status === 'error') { %>
+            <p class="alert-error">Error: <%= query.message || 'Please check your input.' %></p>
+        <% } %>
+
+        <%# We only have an add route for now, edit would require more logic %>
+        <form action="<%= form_action %>" method="POST">
+            <div class="form-group">
+                <label for="item_name">Item Name:</label>
+                <input type="text" id="item_name" name="item_name" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Category (Optional):</label>
+                <input type="text" id="category" name="category" placeholder="e.g., Dairy, Produce, Dry Goods">
+            </div>
+             <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 2;">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" step="any" id="quantity" name="quantity" required placeholder="e.g., 10 or 2.5">
+                </div>
+                 <div style="flex: 1;">
+                    <label for="unit">Unit:</label>
+                     <input type="text" id="unit" name="unit" required placeholder="e.g., kg, items, liters, cans">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="expiry_date">Expiry Date (Optional):</label>
+                <input type="date" id="expiry_date" name="expiry_date">
+            </div>
+
+             <button type="submit">Add Item</button>
+             <button type="button" onclick="window.location.href='/kitchen/inventory'">Cancel</button>
+        </form>
+     </div>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title><%= title %></title>
+     <style>
+         .guide-content { line-height: 1.6; }
+         h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px;}
+         ul { padding-left: 20px; }
+     </style>
+</head>
+<body>
+    <%- include('../partials/header', { user: user }) %>
+
+    <h1><%= title %></h1>
+    <p>Basic steps for kitchen composting (check hotel's specific procedures).</p>
+
+    <div class="guide-content">
+        <h2>1. Collect Organic Scraps</h2>
+        <ul>
+            <li>Use designated kitchen compost bins.</li>
+            <li>Collect fruit/vegetable peels, cores, cuttings.</li>
+            <li>Include coffee grounds, paper filters, tea bags (no staples/plastic).</li>
+            <li>Include eggshells.</li>
+            <li><b>Avoid:</b> Meat, dairy, bones, oils/fats, diseased plants, non-organic materials.</li>
+        </ul>
+
+         <h2>2. Transfer to Main Compost Area</h2>
+        <ul>
+            <li>Regularly empty kitchen bins into the hotel's main compost collection point (e.g., outdoor bin, designated pickup area).</li>
+            <li>Follow procedures for securing the main bin to prevent pests.</li>
+        </ul>
+
+         <h2>3. Balancing Browns and Greens (If managing onsite bin)</h2>
+         <p><i>(This section applies if the hotel manages its own compost pile/bin, otherwise skip to Step 4).</i></p>
+        <ul>
+            <li>Compost needs a mix of "Greens" (nitrogen-rich, like food scraps) and "Browns" (carbon-rich, like dried leaves, cardboard scraps, sawdust).</li>
+            <li>Aim for roughly 2-3 parts Browns to 1 part Greens by volume.</li>
+            <li>Layer materials or mix them gently.</li>
+            <li>Keep the pile moist (like a damp sponge), not waterlogged.</li>
+            <li>Aerate the pile occasionally (turn with a pitchfork) if managing an active bin.</li>
+        </ul>
+
+         <h2>4. Follow Hotel Pickup/Processing Schedule</h2>
+         <ul>
+             <li>Ensure compostable waste is ready according to the schedule provided by the hotel or waste management partner.</li>
+             <li>Use designated bins/bags as instructed.</li>
+         </ul>
+
+          <h2>Key Reminders</h2>
+         <ul>
+             <li>Clean collection bins regularly.</li>
+             <li>Always check hotel-specific guidelines.</li>
+             <li>When in doubt about an item, put it in general waste.</li>
+         </ul>
+
+    </div>
+
+
+     <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>
