@@ -20,46 +20,68 @@ router.use(ensureHousekeeping);
 
 // --- GET /housekeeping/dashboard ---
 // Shows a dashboard for housekeeping staff.
-// Might list rooms needing service, recent logs, etc.
+// Includes rooms needing service, recent logs, and total linen/towel usage.
 router.get('/dashboard', (req, res) => {
-    // Example: Fetch rooms that might need cleaning (e.g., 'occupied' or 'departed' status)
-    // You might need more complex logic based on check-out dates, guest requests etc.
+    // Fetch rooms that might need cleaning
     const roomSql = `SELECT id, room_number, status FROM rooms WHERE status = 'occupied' OR status = 'needs_cleaning' ORDER BY room_number ASC`;
 
-    // Example: Fetch recent logs made by this user
+    // Fetch recent logs made by this user
     const logSql = `SELECT hl.*, r.room_number
                     FROM housekeeping_logs hl
                     JOIN rooms r ON hl.room_id = r.id
                     WHERE hl.staff_user_id = ?
                     ORDER BY hl.log_time DESC LIMIT 10`;
 
+    // *** UPDATED: Fetch totals AND count logs in one query ***
+    const totalsSql = `SELECT
+                           COUNT(*) AS total_logs, -- Added total log count
+                           SUM(CASE WHEN linen_changed = 1 THEN 1 ELSE 0 END) AS total_linen_changed,
+                           SUM(CASE WHEN towels_changed = 1 THEN 1 ELSE 0 END) AS total_towels_changed
+                       FROM housekeeping_logs`;
+
     Promise.all([
+            // Promise to fetch rooms
             new Promise((resolve, reject) => {
                 db.all(roomSql, [], (err, rooms) => {
                     if (err) return reject(`Error fetching rooms: ${err.message}`);
                     resolve(rooms);
                 });
             }),
+            // Promise to fetch recent logs for the current user
             new Promise((resolve, reject) => {
                 db.all(logSql, [req.session.user.id], (err, logs) => {
                     if (err) return reject(`Error fetching logs: ${err.message}`);
                     resolve(logs);
                 });
+            }),
+            // Promise to fetch totals (including log count)
+            new Promise((resolve, reject) => {
+                // Use db.get since we expect exactly one row
+                db.get(totalsSql, [], (err, totals) => {
+                    if (err) return reject(`Error fetching usage totals: ${err.message}`);
+                    // Handle case where the table might be empty
+                    // COUNT(*) returns 0 if empty, SUM returns NULL.
+                    resolve(totals || { total_logs: 0, total_linen_changed: 0, total_towels_changed: 0 });
+                });
             })
         ])
-        .then(([rooms, recentLogs]) => {
-            res.render('staff/housekeeping_dashboard', { // Assumes views/staff/housekeeping_dashboard.ejs
+        .then(([rooms, recentLogs, usageTotals]) => {
+            res.render('staff/housekeeping_dashboard', {
                 title: 'Housekeeping Dashboard',
                 user: req.session.user,
                 rooms: rooms,
-                recentLogs: recentLogs
+                recentLogs: recentLogs,
+                totalLinenChanged: usageTotals.total_linen_changed || 0, // Default to 0 if null
+                totalTowelsChanged: usageTotals.total_towels_changed || 0, // Default to 0 if null
+                totalLogs: usageTotals.total_logs || 0 // Pass total log count (already defaults to 0 from COUNT)
             });
         })
         .catch(error => {
             console.error("Error loading housekeeping dashboard:", error);
-            res.redirect('/'); // Redirect home on error
+            res.status(500).send("Error loading dashboard data.");
         });
 });
+
 
 // --- GET /housekeeping/log/room/:roomId ---
 // Shows a form to log cleaning details for a specific room
@@ -68,12 +90,12 @@ router.get('/log/room/:roomId', (req, res) => {
     const roomSql = `SELECT id, room_number FROM rooms WHERE id = ?`;
     // Also fetch guest preferences for this room if applicable (to show linen opt-out)
     const prefSql = `SELECT gp.opt_out_linen_change
-                      FROM guest_preferences gp
-                      JOIN users u ON gp.guest_user_id = u.id
-                      -- You might need a way to link current guest to room_id, e.g., via a 'stays' table
-                      -- Simplified: Assumes only one guest preference matters per room for now
-                      WHERE gp.room_id = ?
-                      LIMIT 1`;
+                       FROM guest_preferences gp
+                       JOIN users u ON gp.guest_user_id = u.id
+                       -- You might need a way to link current guest to room_id, e.g., via a 'stays' table
+                       -- Simplified: Assumes only one guest preference matters per room for now
+                       WHERE gp.room_id = ?
+                       LIMIT 1`;
 
     Promise.all([
             new Promise((resolve, reject) => {
@@ -123,8 +145,8 @@ router.post('/log', (req, res) => {
     }
 
     const insertLogSql = `INSERT INTO housekeeping_logs
-                            (room_id, staff_user_id, linen_changed, towels_changed, waste_reported, damage_reported)
-                            VALUES (?, ?, ?, ?, ?, ?)`;
+                              (room_id, staff_user_id, linen_changed, towels_changed, waste_reported, damage_reported)
+                              VALUES (?, ?, ?, ?, ?, ?)`;
 
     // First, insert the log
     db.run(insertLogSql, [room_id, staffUserId, linenChangedVal, towelsChangedVal, waste_reported, damage_reported], function(err) {
@@ -169,18 +191,18 @@ router.post('/log', (req, res) => {
 router.get('/logs', (req, res) => {
     const { search, staff, room, sort } = req.query;
     let sql = `SELECT
-                    hl.log_id,
-                    hl.log_time,
-                    r.room_number,
-                    u.username as staff_username,
-                    hl.linen_changed,
-                    hl.towels_changed,
-                    hl.waste_reported,
-                    hl.damage_reported
-                FROM housekeeping_logs hl
-                JOIN rooms r ON hl.room_id = r.id
-                JOIN users u ON hl.staff_user_id = u.id
-                WHERE 1=1`; // Start with a condition that is always true
+                   hl.log_id,
+                   hl.log_time,
+                   r.room_number,
+                   u.username as staff_username,
+                   hl.linen_changed,
+                   hl.towels_changed,
+                   hl.waste_reported,
+                   hl.damage_reported
+               FROM housekeeping_logs hl
+               JOIN rooms r ON hl.room_id = r.id
+               JOIN users u ON hl.staff_user_id = u.id
+               WHERE 1=1`; // Start with a condition that is always true
 
     const params = [];
 
