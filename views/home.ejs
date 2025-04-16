@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><% title %></title>
+    <title>
+        <% title %>
+    </title>
 </head>
+
 <body>
     <header>
         <h1>Welcome to Tfokomala</h1>
@@ -28,13 +32,13 @@
             <form action="/book" method="POST">
                 <label for="checkin">Check-in Date:</label>
                 <input type="date" id="checkin" name="checkin" required>
-                
+
                 <label for="checkout">Check-out Date:</label>
                 <input type="date" id="checkout" name="checkout" required>
-                
+
                 <label for="guests">Number of Guests:</label>
                 <input type="number" id="guests" name="guests" min="1" required>
-                
+
                 <button type="submit">Book Now</button>
             </form>
         </section>
@@ -51,7 +55,9 @@
     </main>
 
     <footer>
-        <p>&copy; <%= new Date().getFullYear() %> Tfokomala. All Rights Reserved.</p>
+        <p>&copy;
+            <%= new Date().getFullYear() %> Tfokomala. All Rights Reserved.</p>
     </footer>
 </body>
+
 </html>

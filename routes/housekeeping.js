@@ -34,31 +34,31 @@ router.get('/dashboard', (req, res) => {
                     ORDER BY hl.log_time DESC LIMIT 10`;
 
     Promise.all([
-        new Promise((resolve, reject) => {
-            db.all(roomSql, [], (err, rooms) => {
-                if (err) return reject(`Error fetching rooms: ${err.message}`);
-                resolve(rooms);
-            });
-        }),
-        new Promise((resolve, reject) => {
-            db.all(logSql, [req.session.user.id], (err, logs) => {
-                 if (err) return reject(`Error fetching logs: ${err.message}`);
-                 resolve(logs);
+            new Promise((resolve, reject) => {
+                db.all(roomSql, [], (err, rooms) => {
+                    if (err) return reject(`Error fetching rooms: ${err.message}`);
+                    resolve(rooms);
+                });
+            }),
+            new Promise((resolve, reject) => {
+                db.all(logSql, [req.session.user.id], (err, logs) => {
+                    if (err) return reject(`Error fetching logs: ${err.message}`);
+                    resolve(logs);
+                });
+            })
+        ])
+        .then(([rooms, recentLogs]) => {
+            res.render('staff/housekeeping_dashboard', { // Assumes views/staff/housekeeping_dashboard.ejs
+                title: 'Housekeeping Dashboard',
+                user: req.session.user,
+                rooms: rooms,
+                recentLogs: recentLogs
             });
         })
-    ])
-    .then(([rooms, recentLogs]) => {
-        res.render('staff/housekeeping_dashboard', { // Assumes views/staff/housekeeping_dashboard.ejs
-            title: 'Housekeeping Dashboard',
-            user: req.session.user,
-            rooms: rooms,
-            recentLogs: recentLogs
+        .catch(error => {
+            console.error("Error loading housekeeping dashboard:", error);
+            res.redirect('/'); // Redirect home on error
         });
-    })
-    .catch(error => {
-        console.error("Error loading housekeeping dashboard:", error);
-        res.redirect('/'); // Redirect home on error
-    });
 });
 
 // --- GET /housekeeping/log/room/:roomId ---
@@ -68,42 +68,42 @@ router.get('/log/room/:roomId', (req, res) => {
     const roomSql = `SELECT id, room_number FROM rooms WHERE id = ?`;
     // Also fetch guest preferences for this room if applicable (to show linen opt-out)
     const prefSql = `SELECT gp.opt_out_linen_change
-                     FROM guest_preferences gp
-                     JOIN users u ON gp.guest_user_id = u.id
-                     -- You might need a way to link current guest to room_id, e.g., via a 'stays' table
-                     -- Simplified: Assumes only one guest preference matters per room for now
-                     WHERE gp.room_id = ?
-                     LIMIT 1`;
+                      FROM guest_preferences gp
+                      JOIN users u ON gp.guest_user_id = u.id
+                      -- You might need a way to link current guest to room_id, e.g., via a 'stays' table
+                      -- Simplified: Assumes only one guest preference matters per room for now
+                      WHERE gp.room_id = ?
+                      LIMIT 1`;
 
-     Promise.all([
-         new Promise((resolve, reject) => {
-             db.get(roomSql, [roomId], (err, room) => {
-                 if (err) return reject(`Error fetching room: ${err.message}`);
-                 if (!room) return reject('Room not found');
-                 resolve(room);
-             });
-         }),
-          new Promise((resolve, reject) => {
-              db.get(prefSql, [roomId], (err, preference) => {
-                  // Don't reject if preferences not found, just resolve null/default
-                  if (err) console.error("Error fetching guest preference:", err.message);
-                  resolve(preference || { opt_out_linen_change: 0 });
-              });
-          })
-     ])
-    .then(([room, preference]) => {
-         res.render('staff/housekeeping_log_form', { // Assumes views/staff/housekeeping_log_form.ejs
-             title: `Log for Room ${room.room_number}`,
-             user: req.session.user,
-             room: room,
-             preference: preference
-         });
-    })
-    .catch(error => {
-         console.error("Error loading log form:", error);
-         // Redirect or show error
-         res.redirect('/housekeeping/dashboard');
-    });
+    Promise.all([
+            new Promise((resolve, reject) => {
+                db.get(roomSql, [roomId], (err, room) => {
+                    if (err) return reject(`Error fetching room: ${err.message}`);
+                    if (!room) return reject('Room not found');
+                    resolve(room);
+                });
+            }),
+            new Promise((resolve, reject) => {
+                db.get(prefSql, [roomId], (err, preference) => {
+                    // Don't reject if preferences not found, just resolve null/default
+                    if (err) console.error("Error fetching guest preference:", err.message);
+                    resolve(preference || { opt_out_linen_change: 0 });
+                });
+            })
+        ])
+        .then(([room, preference]) => {
+            res.render('staff/housekeeping_log_form', { // Assumes views/staff/housekeeping_log_form.ejs
+                title: `Log for Room ${room.room_number}`,
+                user: req.session.user,
+                room: room,
+                preference: preference
+            });
+        })
+        .catch(error => {
+            console.error("Error loading log form:", error);
+            // Redirect or show error
+            res.redirect('/housekeeping/dashboard');
+        });
 });
 
 
@@ -123,8 +123,8 @@ router.post('/log', (req, res) => {
     }
 
     const insertLogSql = `INSERT INTO housekeeping_logs
-                 (room_id, staff_user_id, linen_changed, towels_changed, waste_reported, damage_reported)
-                 VALUES (?, ?, ?, ?, ?, ?)`;
+                            (room_id, staff_user_id, linen_changed, towels_changed, waste_reported, damage_reported)
+                            VALUES (?, ?, ?, ?, ?, ?)`;
 
     // First, insert the log
     db.run(insertLogSql, [room_id, staffUserId, linenChangedVal, towelsChangedVal, waste_reported, damage_reported], function(err) {
@@ -164,14 +164,11 @@ router.post('/log', (req, res) => {
     });
 });
 
-// Add these routes inside routes/housekeeping.js, before module.exports
-
 // --- GET /housekeeping/logs ---
 // Displays a more detailed list of housekeeping logs, potentially with filtering
 router.get('/logs', (req, res) => {
-    // Example: Fetch all logs, joining with user and room names
-    // Add pagination in a real application for large datasets
-    const sql = `SELECT
+    const { search, staff, room, sort } = req.query;
+    let sql = `SELECT
                     hl.log_id,
                     hl.log_time,
                     r.room_number,
@@ -180,45 +177,114 @@ router.get('/logs', (req, res) => {
                     hl.towels_changed,
                     hl.waste_reported,
                     hl.damage_reported
-                 FROM housekeeping_logs hl
-                 JOIN rooms r ON hl.room_id = r.id
-                 JOIN users u ON hl.staff_user_id = u.id
-                 ORDER BY hl.log_time DESC`; // Show most recent first
+                FROM housekeeping_logs hl
+                JOIN rooms r ON hl.room_id = r.id
+                JOIN users u ON hl.staff_user_id = u.id
+                WHERE 1=1`; // Start with a condition that is always true
 
-    db.all(sql, [], (err, logs) => {
-        if (err) {
-            console.error("Error fetching detailed housekeeping logs:", err.message);
-            // Redirect to dashboard or show an error
+    const params = [];
+
+    if (search) {
+        sql += ` AND (r.room_number LIKE ? OR u.username LIKE ?)`;
+        params.push(`%${search}%`, `%${search}%`);
+    }
+
+    if (staff) {
+        sql += ` AND u.id = ?`;
+        params.push(staff);
+    }
+
+    if (room) {
+        sql += ` AND r.id = ?`;
+        params.push(room);
+    }
+
+    let orderBy = 'hl.log_time DESC'; // Default sorting
+    if (sort === 'oldest') {
+        orderBy = 'hl.log_time ASC';
+    } else if (sort === 'room') {
+        orderBy = 'r.room_number ASC';
+    } else if (sort === 'staff') {
+        orderBy = 'u.username ASC';
+    }
+    sql += ` ORDER BY ${orderBy}`;
+
+    // Fetch all housekeeping staff for the filter
+    const staffListSql = `SELECT id, username FROM users WHERE role = 'housekeeping' OR role = 'admin' ORDER BY username ASC`;
+    const roomsListSql = `SELECT id, room_number FROM rooms ORDER BY room_number ASC`;
+
+    Promise.all([
+            new Promise((resolve, reject) => {
+                db.all(sql, params, (err, logs) => {
+                    if (err) return reject(`Error fetching detailed housekeeping logs: ${err.message}`);
+                    resolve(logs);
+                });
+            }),
+            new Promise((resolve, reject) => {
+                db.all(staffListSql, [], (err, staffList) => {
+                    if (err) return reject(`Error fetching staff list: ${err.message}`);
+                    resolve(staffList);
+                });
+            }),
+            new Promise((resolve, reject) => {
+                db.all(roomsListSql, [], (err, roomsList) => {
+                    if (err) return reject(`Error fetching rooms list: ${err.message}`);
+                    resolve(roomsList);
+                });
+            })
+        ])
+        .then(([logs, staffList, roomsList]) => {
+            res.render('staff/housekeeping_logs_list', { // Assumes views/staff/housekeeping_logs_list.ejs
+                title: 'Detailed Housekeeping Logs',
+                user: req.session.user,
+                logs: logs,
+                search: search || '',
+                staffFilter: staff || '',
+                roomFilter: room || '',
+                sortOrder: sort || 'newest',
+                staffList: staffList,
+                roomsList: roomsList
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching detailed housekeeping logs:", error);
             return res.redirect('/housekeeping/dashboard');
-        }
-
-        res.render('staff/housekeeping_logs_list', { // Assumes views/staff/housekeeping_logs_list.ejs
-            title: 'Detailed Housekeeping Logs',
-            user: req.session.user,
-            logs: logs // Pass the fetched logs array to the view
         });
-    });
 });
 
 
 // --- GET /housekeeping/supplies ---
-// Displays current housekeeping supply levels
+// Displays current housekeeping supply levels with search and low stock filter
 router.get('/supplies', (req, res) => {
-    const sql = `SELECT id, item_name, current_stock, reorder_level, unit, last_updated
-                 FROM housekeeping_supplies
-                 ORDER BY item_name ASC`;
+    const { search, low_stock } = req.query;
+    let sql = `SELECT id, item_name, current_stock, reorder_level, unit, last_updated
+               FROM housekeeping_supplies
+               WHERE 1=1`;
+    const params = [];
 
-    db.all(sql, [], (err, supplies) => {
+    if (search) {
+        sql += ` AND item_name LIKE ?`;
+        params.push(`%${search}%`);
+    }
+
+    if (low_stock === 'true') {
+        sql += ` AND current_stock < reorder_level`;
+    }
+
+    sql += ` ORDER BY item_name ASC`;
+
+    db.all(sql, params, (err, supplies) => {
         if (err) {
             console.error("Error fetching housekeeping supplies:", err.message);
-            // Redirect or show error
             return res.redirect('/housekeeping/dashboard');
         }
 
         res.render('staff/housekeeping_supplies', { // Assumes views/staff/housekeeping_supplies.ejs
             title: 'Housekeeping Supplies Stock',
             user: req.session.user,
-            supplies: supplies // Pass the supply list to the view
+            supplies: supplies,
+            search: search || '',
+            lowStockFilter: low_stock || ''
         });
     });
 });
@@ -229,9 +295,9 @@ router.post('/supplies/update', (req, res) => {
     const { supply_id, change_amount } = req.body; // Expecting item ID and the amount to add/subtract
 
     if (!supply_id || change_amount === undefined || isNaN(parseInt(change_amount))) {
-         console.error("Invalid input for supply update:", req.body);
-         // Redirect back with error message - ideally use flash messages
-         return res.redirect('/housekeeping/supplies?update_status=error');
+        console.error("Invalid input for supply update:", req.body);
+        // Redirect back with error message - ideally use flash messages
+        return res.redirect('/housekeeping/supplies?update_status=error');
     }
 
     const amount = parseInt(change_amount);
@@ -243,17 +309,17 @@ router.post('/supplies/update', (req, res) => {
                  WHERE id = ?`;
 
     db.run(sql, [amount, supply_id], function(err) {
-         if (err) {
+        if (err) {
             console.error("Error updating supply stock:", err.message);
             return res.redirect('/housekeeping/supplies?update_status=db_error');
-         }
-         if (this.changes === 0) {
-             console.error(`Supply item with id ${supply_id} not found for update.`);
-             return res.redirect('/housekeeping/supplies?update_status=not_found');
-         }
+        }
+        if (this.changes === 0) {
+            console.error(`Supply item with id ${supply_id} not found for update.`);
+            return res.redirect('/housekeeping/supplies?update_status=not_found');
+        }
 
-         console.log(`Updated stock for supply ID ${supply_id} by ${amount}.`);
-         res.redirect('/housekeeping/supplies?update_status=success');
+        console.log(`Updated stock for supply ID ${supply_id} by ${amount}.`);
+        res.redirect('/housekeeping/supplies?update_status=success');
     });
 });
 
