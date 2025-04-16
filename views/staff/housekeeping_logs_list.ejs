@@ -1,55 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css">
-    <title><%= title %></title>
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/house-keeping/css/dashboard.css">
+    <title>
+        <%= title %>
+    </title>
     <style>
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        td.wrap { max-width: 200px; white-space: pre-wrap; word-wrap: break-word; }
+        /* Additional styles specific to the logs page can be added here */
+        
+        #content main .table-data .order table td.wrap {
+            max-width: 200px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
     </style>
 </head>
+
 <body>
-    <%- include('../partials/header', { user: user }) %>
 
-    <h1><%= title %></h1>
+    <section id="sidebar">
+        <a href="/housekeeping/dashboard" class="brand">
+            <i class='bx bxs-smile'></i>
+            <span class="text"><%= user.username %>.</span>
+        </a>
+        <ul class="side-menu top">
+            <li class="<%= title === 'Housekeeping Dashboard' ? 'active' : '' %>">
+                <a href="/housekeeping/dashboard">
+                    <i class='bx bxs-dashboard'></i>
+                    <span class="text">Dashboard</span>
+                </a>
+            </li>
+            <li class="<%= title === 'Housekeeping Supplies Stock' ? 'active' : '' %>">
+                <a href="/housekeeping/supplies">
+                    <i class='bx bxs-shopping-bag-alt'></i>
+                    <span class="text">HK Supplies</span>
+                </a>
+            </li>
+            <li class="<%= title === 'Detailed Housekeeping Logs' ? 'active' : '' %>">
+                <a href="/housekeeping/logs">
+                    <i class='bx bxs-doughnut-chart'></i>
+                    <span class="text">Recent Logs</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bxs-message-dots'></i>
+                    <span class="text">Tips</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="#">
+                    <i class='bx bxs-cog'></i>
+                    <span class="text">Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="/auth/logout" class="logout">
+                    <i class='bx bxs-log-out-circle'></i>
+                    <span class="text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </section>
 
-     <% if (logs && logs.length > 0) { %>
-        <table>
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Room</th>
-                    <th>Staff</th>
-                    <th>Linen Changed</th>
-                    <th>Towels Changed</th>
-                    <th>Waste Reported</th>
-                    <th>Damage Reported</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% logs.forEach(log => { %>
-                    <tr>
-                        <td><%= new Date(log.log_time).toLocaleString() %></td>
-                        <td><%= log.room_number %></td>
-                        <td><%= log.staff_username %></td>
-                        <td><%= log.linen_changed ? 'Yes' : 'No' %></td>
-                        <td><%= log.towels_changed ? 'Yes' : 'No' %></td>
-                        <td class="wrap"><%= log.waste_reported || '-' %></td>
-                        <td class="wrap"><%= log.damage_reported || '-' %></td>
-                    </tr>
-                <% }); %>
-            </tbody>
-        </table>
-    <% } else { %>
-        <p>No housekeeping logs found.</p>
-    <% } %>
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu'></i>
+            <a href="#" class="nav-link">Categories</a>
 
-    <p><a href="/housekeeping/dashboard">Back to Dashboard</a></p>
+            <input type="checkbox" id="switch-mode" hidden>
+            <label for="switch-mode" class="switch-mode"></label>
+            <a href="/auth/logout" class="notification" style="display: flex; align-items: center; gap: 0.2em;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <small>Logout</small>
+            </a>
+        </nav>
 
-    <%- include('../partials/footer') %>
+        <main>
+            <div class="head-title">
+                <div class="left">
+                    <h1>
+                        <%= title %>sss
+                    </h1>
+                    <ul class="breadcrumb">
+                        <li>
+                            <a href="/housekeeping/dashboard">Dashboard</a>
+                        </li>
+                        <li><i class='bx bx-chevron-right'></i></li>
+                        <li>
+                            <a class="active" href="/housekeeping/logs">Recent Logs</a>
+                        </li>
+                        <li>
+                            <p class="active" href="/housekeeping/logs" style="margin-left: 26em;">Filter By: </p>
+                        </li>
+                        <form action="/housekeeping/logs" method="GET" class="filter-form" style="display: flex; gap: 1em;">
+
+                            <div class="select-group">
+                                <label for="staff">Staff:</label>
+                                <select name="staff" id="staff" onchange="this.form.submit()">
+                                    <option value="">All Staff</option>
+                                    <% if (staffList && staffList.length > 0) { %>
+                                        <% staffList.forEach(staff => { %>
+                                            <option value="<%= staff.id %>" <%= staffFilter === staff.id.toString() ? 'selected' : '' %>><%= staff.username %></option>
+                                        <% }); %>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class="select-group">
+                                <label for="room">Room:</label>
+                                <select name="room" id="room" onchange="this.form.submit()">
+                                    <option value="">All Rooms</option>
+                                    <% if (roomsList && roomsList.length > 0) { %>
+                                        <% roomsList.forEach(room => { %>
+                                            <option value="<%= room.id %>" <%= roomFilter === room.id.toString() ? 'selected' : '' %>>Room <%= room.room_number %></option>
+                                        <% }); %>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class="select-group">
+                                <label for="sort">Sort By:</label>
+                                <select name="sort" id="sort" onchange="this.form.submit()">
+                                    <option value="newest" <%= sortOrder === 'newest' ? 'selected' : '' %>>Newest First</option>
+                                    <option value="oldest" <%= sortOrder === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+                                    <option value="room" <%= sortOrder === 'room' ? 'selected' : '' %>>Room Number</option>
+                                    <option value="staff" <%= sortOrder === 'staff' ? 'selected' : '' %>>Staff Name</option>
+                                </select>
+                            </div>
+                        </form>
+                    </ul>
+
+                </div>
+            </div>
+
+            <div class="table-data">
+                <div class="order">
+                    <div class="head">
+                        <h3>Housekeeping Logs</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Room</th>
+                                <th>Staff</th>
+                                <th>Linen Changed</th>
+                                <th>Towels Changed</th>
+                                <th>Waste Reported</th>
+                                <th>Damage Reported</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (logs && logs.length > 0) { %>
+                                <% logs.forEach(log => { %>
+                                    <tr>
+                                        <td>
+                                            <%= new Date(log.log_time).toLocaleString() %>
+                                        </td>
+                                        <td>Room
+                                            <%= log.room_number %>
+                                        </td>
+                                        <td>
+                                            <%= log.staff_username %>
+                                        </td>
+                                        <td>
+                                            <%= log.linen_changed ? 'Yes' : 'No' %>
+                                        </td>
+                                        <td>
+                                            <%= log.towels_changed ? 'Yes' : 'No' %>
+                                        </td>
+                                        <td class="wrap">
+                                            <%= log.waste_reported || '-' %>
+                                        </td>
+                                        <td class="wrap">
+                                            <%= log.damage_reported || '-' %>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="7">No housekeeping logs found based on your criteria.</td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <p>
+                <a href="/housekeeping/dashboard" class="back-link" style="display: inline-flex; align-items: center; gap: 0.5em; margin-top: 20px; color: var(--secondary);">
+                    <i class='bx bx-arrow-back'></i> Back to Dashboard
+                </a>
+            </p>
+
+        </main>
+    </section>
+
+    <script src="/house-keeping/js/script.js"></script>
 </body>
+
 </html>
