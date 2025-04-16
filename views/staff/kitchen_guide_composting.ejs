@@ -1,66 +1,217 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css">
-    <title><%= title %></title>
-     <style>
-         .guide-content { line-height: 1.6; }
-         h2 { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px;}
-         ul { padding-left: 20px; }
-     </style>
-</head>
-<body>
-    <%- include('../partials/header', { user: user }) %>
+<%# views/staff/kitchen_guide_composting.ejs %>
 
-    <h1><%= title %></h1>
-    <p>Basic steps for kitchen composting (check hotel's specific procedures).</p>
+    <!DOCTYPE html>
+    <html lang="en">
 
-    <div class="guide-content">
-        <h2>1. Collect Organic Scraps</h2>
-        <ul>
-            <li>Use designated kitchen compost bins.</li>
-            <li>Collect fruit/vegetable peels, cores, cuttings.</li>
-            <li>Include coffee grounds, paper filters, tea bags (no staples/plastic).</li>
-            <li>Include eggshells.</li>
-            <li><b>Avoid:</b> Meat, dairy, bones, oils/fats, diseased plants, non-organic materials.</li>
-        </ul>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-         <h2>2. Transfer to Main Compost Area</h2>
-        <ul>
-            <li>Regularly empty kitchen bins into the hotel's main compost collection point (e.g., outdoor bin, designated pickup area).</li>
-            <li>Follow procedures for securing the main bin to prevent pests.</li>
-        </ul>
+        <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+        <link rel="stylesheet" href="/kitchen/css/composting.css">
+        <%# Path to your main CSS file %>
 
-         <h2>3. Balancing Browns and Greens (If managing onsite bin)</h2>
-         <p><i>(This section applies if the hotel manages its own compost pile/bin, otherwise skip to Step 4).</i></p>
-        <ul>
-            <li>Compost needs a mix of "Greens" (nitrogen-rich, like food scraps) and "Browns" (carbon-rich, like dried leaves, cardboard scraps, sawdust).</li>
-            <li>Aim for roughly 2-3 parts Browns to 1 part Greens by volume.</li>
-            <li>Layer materials or mix them gently.</li>
-            <li>Keep the pile moist (like a damp sponge), not waterlogged.</li>
-            <li>Aerate the pile occasionally (turn with a pitchfork) if managing an active bin.</li>
-        </ul>
+            <title>
+                <%= title %>
+            </title>
+            <%# Dynamic Title %>
 
-         <h2>4. Follow Hotel Pickup/Processing Schedule</h2>
-         <ul>
-             <li>Ensure compostable waste is ready according to the schedule provided by the hotel or waste management partner.</li>
-             <li>Use designated bins/bags as instructed.</li>
-         </ul>
+                <%# NOTE: Ensure your main style.css includes the .guide-card styles %>
+                    <%# (defined in the previous CSS consolidation) %>
 
-          <h2>Key Reminders</h2>
-         <ul>
-             <li>Clean collection bins regularly.</li>
-             <li>Always check hotel-specific guidelines.</li>
-             <li>When in doubt about an item, put it in general waste.</li>
-         </ul>
+    </head>
 
-    </div>
+    <body>
+
+        <section id="sidebar">
+            <a href="/kitchen/dashboard" class="brand">
+                <i class='bx bxs-store-alt'></i>
+                <span class="text">Staff Hub</span>
+            </a>
+            <ul class="side-menu top">
+                <li>
+                    <a href="/kitchen/dashboard">
+                        <i class='bx bxs-dashboard'></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/kitchen/waste/log">
+                        <i class='bx bxs-trash-alt'></i>
+                        <span class="text">Log Kitchen Waste</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/kitchen/waste/audit">
+                        <i class='bx bxs-doughnut-chart'></i>
+                        <span class="text">Waste Audit Summary</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/kitchen/inventory">
+                        <i class='bx bxs-package'></i>
+                        <span class="text">Manage Inventory</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/kitchen/inventory/add">
+                        <i class='bx bx-plus-circle'></i>
+                        <span class="text">Add Inventory Item</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/kitchen/guides/segregation">
+                        <i class='bx bx-recycle'></i>
+                        <span class="text">Waste Segregation Guide</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <%# Active class for this page %>
+                        <a href="/kitchen/guides/composting">
+                            <i class='bx bxs-leaf'></i>
+                            <span class="text">Composting Guide</span>
+                        </a>
+                </li>
+                <li>
+                    <a href="/kitchen/recipes/scraps">
+                        <i class='bx bx-food-menu'></i>
+                        <span class="text">Food Scrap Recipes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/kitchen/training">
+                        <i class='bx bxs-book-reader'></i>
+                        <span class="text">View Training Materials</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="side-menu">
+                <li>
+                    <a href="#"></a>
+                </li>
+                <li><a href="/logout" class="logout"><i class='bx bxs-log-out-circle'></i><span class="text">Logout</span></a></li>
+            </ul>
+        </section>
+        <section id="content">
+            <nav>
+                <i class='bx bx-menu'></i>
+                <a href="#" class="nav-link">Kitchen Guides</a>
+                <form action="#">
+                    <div class="form-input">
+                        <input type="search" placeholder="Search...">
+                        <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                    </div>
+                </form>
+                <input type="checkbox" id="switch-mode" hidden>
+                <label for="switch-mode" class="switch-mode"></label>
+                <a href="#" class="notification">
+                    <i class='bx bxs-bell'></i><span class="num">0</span>
+                </a>
+                <a href="#" class="profile">
+                    <span style="padding-right: 10px; vertical-align: middle;"><%= user ? user.username : 'User' %></span>
+                    <i class='bx bxs-user-circle' style="font-size: 36px; vertical-align: middle;"></i>
+                </a>
+            </nav>
+            <main>
+                <div class="head-title">
+                    <div class="left">
+                        <h1>
+                            <%= title %>
+                        </h1>
+                        <ul class="breadcrumb">
+                            <li><a href="#">Staff Area</a></li>
+                            <li><i class='bx bx-chevron-right'></i></li>
+                            <li><a href="/kitchen/dashboard">Kitchen</a></li>
+                            <li><i class='bx bx-chevron-right'></i></li>
+                            <li><a class="active" href="/kitchen/guides/composting">Composting Guide</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <%# Removed box-info stats %>
+
+                    <%# Guide Content Area - Using a single guide-card container %>
+                        <div class="guide-card">
+                            <%# Use the class styled in style.css %>
+                                <p>Basic steps for kitchen composting based on typical hotel procedures. <strong>Always verify hotel-specific details.</strong></p>
+
+                                <%# Step 1 %>
+                                    <div class="head" style="border-bottom: none; margin-bottom: 10px;">
+                                        <%# Use .head for icon/title styling %>
+                                            <i class='bx bx-collection' style="color: var(--orange);"></i>
+                                            <%# Icon for Collection %>
+                                                <h2>1. Collect Organic Scraps</h2>
+                                    </div>
+                                    <ul>
+                                        <li>Use designated, clean kitchen compost bins.</li>
+                                        <li>Collect fruit/vegetable peels, cores, cuttings.</li>
+                                        <li>Include coffee grounds, paper filters, tea bags (check for staples/plastic).</li>
+                                        <li>Include eggshells.</li>
+                                        <li><b>Avoid:</b> Meat, dairy, bones, oils/fats, diseased plants, non-organic materials (like plastic, metal, glass).</li>
+                                    </ul>
+
+                                    <%# Step 2 %>
+                                        <div class="head" style="border-bottom: none; margin-bottom: 10px; margin-top: 20px;">
+                                            <i class='bx bxs-truck' style="color: var(--blue);"></i>
+                                            <%# Icon for Transfer %>
+                                                <h2>2. Transfer to Main Compost Area</h2>
+                                        </div>
+                                        <ul>
+                                            <li>Regularly empty kitchen bins into the hotel's main compost collection point (e.g., outdoor bin, designated third-party pickup area).</li>
+                                            <li>Follow procedures for securing the main bin/area to prevent pests and odors.</li>
+                                        </ul>
+
+                                        <%# Step 3 %>
+                                            <div class="head" style="border-bottom: none; margin-bottom: 10px; margin-top: 20px;">
+                                                <i class='bx bx-recycle' style="color: var(--green);"></i>
+                                                <%# Icon for Balancing %>
+                                                    <h2>3. Balancing Browns and Greens (If managing onsite bin)</h2>
+                                            </div>
+                                            <p><i>(This section applies <strong>only</strong> if the hotel manages its own active compost pile/bin. Ask your supervisor if unsure).</i></p>
+                                            <ul>
+                                                <li>Compost needs a mix of "Greens" (nitrogen-rich: food scraps) and "Browns" (carbon-rich: dried leaves, cardboard scraps, sawdust).</li>
+                                                <li>Aim for roughly 2-3 parts Browns to 1 part Greens by volume for optimal decomposition.</li>
+                                                <li>Layer materials or mix them gently when adding to the pile/bin.</li>
+                                                <li>Maintain moisture: The pile should feel like a damp sponge, not soaking wet or bone dry. Add water if dry, or more browns if wet.</li>
+                                                <li>Aerate the pile occasionally (e.g., turn with a pitchfork every 1-2 weeks) to provide oxygen, if managing an active bin.</li>
+                                            </ul>
+
+                                            <%# Step 4 %>
+                                                <div class="head" style="border-bottom: none; margin-bottom: 10px; margin-top: 20px;">
+                                                    <i class='bx bx-calendar-check' style="color: var(--yellow);"></i>
+                                                    <%# Icon for Schedule %>
+                                                        <h2>4. Follow Hotel Pickup/Processing Schedule</h2>
+                                                </div>
+                                                <ul>
+                                                    <li>Ensure compostable waste is collected and stored according to the schedule and procedures provided by the hotel or its waste management partner.</li>
+                                                    <li>Use only designated bins or bags as instructed.</li>
+                                                </ul>
+
+                                                <%# Step 5 %>
+                                                    <div class="head" style="border-bottom: none; margin-bottom: 10px; margin-top: 20px;">
+                                                        <i class='bx bx-message-alt-error' style="color: var(--red);"></i>
+                                                        <%# Icon for Reminders %>
+                                                            <h2>Key Reminders</h2>
+                                                    </div>
+                                                    <ul>
+                                                        <li>Clean collection bins frequently to prevent odors and pests.</li>
+                                                        <li>Always adhere to the specific composting guidelines provided by hotel management.</li>
+                                                        <li><b>When in doubt about an item, put it in the general waste bin</b> to avoid contamination.</li>
+                                                    </ul>
+
+                        </div>
+                        <%# End guide-card %>
 
 
-     <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+                            <div style="margin-top: 30px; text-align: center;">
+                                <a href="/kitchen/dashboard" class="btn-download" style="background-color: var(--dark-grey);">
+                                    <i class='bx bx-arrow-back'></i> Back to Dashboard
+                                </a>
+                            </div>
 
-    <%- include('../partials/footer') %>
-</body>
-</html>
+            </main>
+        </section>
+        <script src="/kitchen/js/dashboard.js"></script>
+    </body>
+
+    </html>

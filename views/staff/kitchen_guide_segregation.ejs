@@ -1,71 +1,210 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css">
-    <title><%= title %></title>
-     <style>
-        .guide-section { margin-bottom: 20px; padding: 15px; border-left: 4px solid #17a2b8; background-color: #f8f9fa; }
-        h2 { margin-top: 0; }
-        ul { padding-left: 20px; }
-     </style>
-</head>
-<body>
-    <%- include('../partials/header', { user: user }) %>
+<%# views/staff/kitchen_guide_segregation.ejs %>
 
-    <h1><%= title %></h1>
-    <p>Proper waste segregation is crucial for recycling and composting efforts.</p>
+    <!DOCTYPE html>
+    <html lang="en">
 
-    <div class="guide-section">
-        <h2>General Principles</h2>
-        <ul>
-            <li><strong>Clean & Dry:</strong> Ensure recyclable materials (paper, plastic, cans) are clean and dry.</li>
-            <li><strong>Empty Containers:</strong> Empty food and liquid containers before recycling.</li>
-            <li><strong>Check Local Rules:</strong> Always refer to specific local guidelines as rules can vary.</li>
-            <li><strong>When in Doubt, Throw it Out:</strong> If unsure if an item is recyclable or compostable, put it in general waste to avoid contaminating batches.</li>
-        </ul>
-    </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-     <div class="guide-section" style="border-left-color: #28a745;">
-        <h2>Compostable (Organic Waste)</h2>
-        <ul>
-            <li>Fruit and vegetable scraps (peels, cores, cuttings)</li>
-            <li>Coffee grounds and paper filters</li>
-            <li>Tea bags (check for plastic/staples)</li>
-            <li>Eggshells</li>
-            <li>Spoiled leftovers (no meat, dairy, or oily foods - check local rules)</li>
-            <li>Paper napkins and towels (if not heavily soiled with chemicals)</li>
-            <li><b>DO NOT Compost:</b> Meat, bones, dairy, fats/oils, diseased plants, plastic-coated items.</li>
-        </ul>
-    </div>
+        <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+        <link rel="stylesheet" href="/kitchen/css/segregation-guide.css">
+        <style>
+            .guide-card {
+                /* Use instead of .order if you want different styling */
+                border-radius: 20px;
+                background: var(--light);
+                padding: 24px;
+                margin-bottom: 24px;
+                /* Space between cards */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                color: var(--dark);
+            }
+            
+            .guide-card .head {
+                /* Optional header within the card */
+                display: flex;
+                align-items: center;
+                grid-gap: 16px;
+                margin-bottom: 24px;
+            }
+            
+            .guide-card .head h2 {
+                margin: 0;
+                /* Reset margin if using .head */
+                font-size: 20px;
+                font-weight: 600;
+            }
+            
+            .guide-card .head .bx {
+                /* Icon in header */
+                font-size: 24px;
+                color: var(--blue);
+                /* Default icon color */
+            }
+            /* Color variations for guide cards */
+            
+            .guide-card.general .head .bx {
+                color: var(--dark-grey);
+            }
+            
+            .guide-card.compost .head .bx {
+                color: #28a745;
+            }
+            /* Green */
+            
+            .guide-card.recycle .head .bx {
+                color: var(--blue);
+            }
+            
+            .guide-card.landfill .head .bx {
+                color: var(--red);
+            }
+            
+            .guide-card ul {
+                padding-left: 25px;
+                /* Indent list */
+                list-style: disc;
+                /* Use standard bullets */
+                margin: 0;
+            }
+            
+            .guide-card ul li {
+                margin-bottom: 10px;
+                /* Space between list items */
+                line-height: 1.6;
+                font-size: 14px;
+            }
+            
+            .guide-card ul li strong {
+                font-weight: 600;
+            }
+            
+            .guide-card p {
+                /* Style paragraphs within card if needed */
+                margin-bottom: 15px;
+                line-height: 1.6;
+                font-size: 14px;
+            }
+            
+            .guide-card b {
+                /* Highlight DO NOT sections */
+                color: var(--red);
+                font-weight: 600;
+            }
+        </style>
 
-     <div class="guide-section" style="border-left-color: #007bff;">
-        <h2>Recyclable</h2>
-        <ul>
-            <li><b>Paper:</b> Newspapers, magazines, cardboard (flattened), office paper, junk mail.</li>
-            <li><b>Plastics:</b> Check for recycling symbols (numbers 1-7). Typically includes bottles (drinks, shampoo), jugs (milk), tubs (yogurt - check locally), some containers. Rinse clean.</li>
-            <li><b>Glass:</b> Bottles and jars (clear, brown, green). Rinse clean. Remove lids (recycle separately if metal).</li>
-            <li><b>Metal:</b> Aluminum cans (soda, beer), steel/tin cans (food). Rinse clean.</li>
-            <li><b>DO NOT Recycle:</b> Plastic bags/film (check store drop-off), styrofoam, ceramics, broken glass, greasy pizza boxes, food-soiled paper, disposable coffee cups (usually mixed materials).</li>
-        </ul>
-    </div>
 
-     <div class="guide-section" style="border-left-color: #6c757d;">
-        <h2>General Waste (Landfill)</h2>
-        <ul>
-            <li>Items that cannot be composted or recycled.</li>
-            <li>Plastic wrap, film, bags (unless specific local recycling exists).</li>
-            <li>Styrofoam packaging.</li>
-            <li>Food-soiled containers (unless specifically accepted for composting).</li>
-            <li>Broken ceramics or glass.</li>
-            <li>Disposable diapers.</li>
-            <li>Anything you are unsure about.</li>
-        </ul>
-    </div>
+        </style>
+    </head>
 
-     <p><a href="/kitchen/dashboard">Back to Dashboard</a></p>
+    <body>
+        <section id="sidebar"><a href="/kitchen/dashboard" class="brand"><i class='bx bxs-store-alt'></i><span class="text">Staff Hub</span></a>
+            <ul class="side-menu top">
+                <li><a href="/kitchen/dashboard"><i class='bx bxs-dashboard'></i><span class="text">Dashboard</span></a></li>
+                <li><a href="/kitchen/waste/log"><i class='bx bxs-trash-alt'></i><span class="text">Log Kitchen Waste</span></a></li>
+                <li><a href="/kitchen/waste/audit"><i class='bx bxs-doughnut-chart'></i><span class="text">Waste Audit Summary</span></a></li>
+                <li><a href="/kitchen/inventory"><i class='bx bxs-package'></i><span class="text">Manage Inventory</span></a></li>
+                <li><a href="/kitchen/inventory/add"><i class='bx bx-plus-circle'></i><span class="text">Add Inventory Item</span></a></li>
+                <li class="active">
+                    <%# Active class for this page %><a href="/kitchen/guides/segregation"><i class='bx bx-recycle'></i><span class="text">Waste Segregation Guide</span></a></li>
+                <li><a href="/kitchen/guides/composting"><i class='bx bxs-leaf'></i><span class="text">Composting Guide</span></a></li>
+                <li><a href="/kitchen/recipes/scraps"><i class='bx bx-food-menu'></i><span class="text">Food Scrap Recipes</span></a></li>
+                <li><a href="/kitchen/training"><i class='bx bxs-book-reader'></i><span class="text">View Training Materials</span></a></li>
+            </ul>
+            <ul class="side-menu">
+                <li>
+                    <a href="#"></a>
+                </li>
+                <li><a href="/logout" class="logout"><i class='bx bxs-log-out-circle'></i><span class="text">Logout</span></a></li>
+            </ul>
+        </section>
+        <section id="content">
+            <nav><i class='bx bx-menu'></i><a href="#" class="nav-link">Kitchen Guides</a>
+                <form action="#">
+                    <div class="form-input"><input type="search" placeholder="Search..."><button type="submit" class="search-btn"><i class='bx bx-search'></i></button></div>
+                </form><input type="checkbox" id="switch-mode" hidden><label for="switch-mode" class="switch-mode"></label><a href="#" class="notification"><i class='bx bxs-bell'></i><span class="num">0</span></a><a href="#" class="profile"><span style="padding-right: 10px; vertical-align: middle;"><%=user ? user.username: 'User' %></span><i class='bx bxs-user-circle' style="font-size: 36px; vertical-align: middle;"></i></a></nav>
+            <main>
+                <div class="head-title">
+                    <div class="left">
+                        <h1>
+                            <%=title %>
+                        </h1>
+                        <ul class="breadcrumb">
+                            <li><a href="#">Staff Area</a></li>
+                            <li><i class='bx bx-chevron-right'></i></li>
+                            <li><a href="/kitchen/dashboard">Kitchen</a></li>
+                            <li><i class='bx bx-chevron-right'></i></li>
+                            <li><a class="active" href="/kitchen/guides/segregation">Segregation Guide</a></li>
+                        </ul>
+                    </div>
+                    <%# Download button maybe not needed for guide page %>
+                </div>
+                <%# Removed box-info stats %>
+                    <%# Guide Content Area %>
+                        <%# Using guide-card class - ensure styles are in style.css %>
+                            <div class="guide-card general">
+                                <%# Added modifier class %>
+                                    <div class="head"><i class='bx bx-info-circle'></i>
+                                        <%# Icon for general info %>
+                                            <h2>General Principles</h2>
+                                    </div>
+                                    <p>Proper waste segregation is crucial for recycling and composting efforts.</p>
+                                    <ul>
+                                        <li><strong>Clean & Dry:</strong>Ensure recyclable materials (paper, plastic, cans) are clean and dry.</li>
+                                        <li><strong>Empty Containers:</strong>Empty food and liquid containers before recycling.</li>
+                                        <li><strong>Check Local Rules:</strong>Always refer to specific local guidelines as rules can vary.</li>
+                                        <li><strong>When in Doubt,
+            Throw it Out:</strong>If unsure if an item is recyclable or compostable, put it in general waste to avoid contaminating batches.</li>
+                                    </ul>
+                            </div>
+                            <div class="guide-card compost">
+                                <div class="head"><i class='bx bxs-leaf'></i>
+                                    <%# Icon for compost %>
+                                        <h2>Compostable (Organic Waste)</h2>
+                                </div>
+                                <ul>
+                                    <li>Fruit and vegetable scraps (peels, cores, cuttings)</li>
+                                    <li>Coffee grounds and paper filters</li>
+                                    <li>Tea bags (check for plastic/staples)</li>
+                                    <li>Eggshells</li>
+                                    <li>Spoiled leftovers (<b>no meat, dairy, or oily foods</b> - check local rules)</li>
+                                    <li>Paper napkins and towels (if not heavily soiled with chemicals)</li>
+                                    <li><b>DO NOT Compost:</b>Meat, bones, dairy, fats/oils, diseased plants, plastic-coated items.</li>
+                                </ul>
+                            </div>
+                            <div class="guide-card recycle">
+                                <div class="head"><i class='bx bx-recycle'></i>
+                                    <%# Icon for recycle %>
+                                        <h2>Recyclable</h2>
+                                </div>
+                                <ul>
+                                    <li><b>Paper:</b>Newspapers, magazines, cardboard (flattened), office paper, junk mail.</li>
+                                    <li><b>Plastics:</b>Check for recycling symbols (numbers 1-7). Typically includes bottles (drinks, shampoo), jugs (milk), tubs (yogurt - check locally), some containers. Rinse clean.</li>
+                                    <li><b>Glass:</b>Bottles and jars (clear, brown, green). Rinse clean. Remove lids (recycle separately if metal).</li>
+                                    <li><b>Metal:</b>Aluminum cans (soda, beer), steel/tin cans (food). Rinse clean.</li>
+                                    <li><b>DO NOT Recycle:</b>Plastic bags/film (check store drop-off), styrofoam, ceramics, broken glass, greasy pizza boxes, food-soiled paper, disposable coffee cups (usually mixed materials).</li>
+                                </ul>
+                            </div>
+                            <div class="guide-card landfill">
+                                <div class="head"><i class='bx bxs-trash'></i>
+                                    <%# Icon for landfill/general waste %>
+                                        <h2>General Waste (Landfill)</h2>
+                                </div>
+                                <ul>
+                                    <li>Items that cannot be composted or recycled.</li>
+                                    <li>Plastic wrap, film, bags (unless specific local recycling exists).</li>
+                                    <li>Styrofoam packaging.</li>
+                                    <li>Food-soiled containers (unless specifically accepted for composting).</li>
+                                    <li>Broken ceramics or glass.</li>
+                                    <li>Disposable diapers.</li>
+                                    <li>Anything you are unsure about.</li>
+                                </ul>
+                            </div>
+                            <div style="margin-top: 30px; text-align: center;"><a href="/kitchen/dashboard" class="btn-download" style="background-color: var(--dark-grey);"><i class='bx bx-arrow-back'></i>Back to Dashboard </a></div>
+            </main>
+        </section>
+        <script src="/kitchen/js/dashboard.js"></script>
+    </body>
 
-    <%- include('../partials/footer') %>
-</body>
-</html>
+    </html>

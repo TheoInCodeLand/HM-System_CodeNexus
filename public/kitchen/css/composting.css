@@ -1,0 +1,1354 @@
+/* /public/css/style.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+:root {
+    --poppins: 'Poppins', sans-serif;
+    --lato: 'Lato', sans-serif;
+    --light: #F9F9F9;
+    --blue: #3C91E6;
+    --light-blue: #CFE8FF;
+    --grey: #eee;
+    --dark-grey: #AAAAAA;
+    --dark: #342E37;
+    --red: #DB504A;
+    --light-red: #FFE0D3;
+    --yellow: #FFCE26;
+    --light-yellow: #FFF2C6;
+    --orange: #FD7238;
+    --light-orange: #FFE0D3;
+    --green: #28a745;
+    /* Added green for compost */
+    --light-green: #d4edda;
+    /* Added light green */
+}
+
+html {
+    overflow-x: hidden;
+}
+
+
+/* Dark Mode Variables */
+
+body.dark {
+    --light: #0C0C1E;
+    --grey: #1a1a2e;
+    --dark-grey: #333;
+    --dark: #FBFBFB;
+    --light-red: #db504a20;
+    --light-green: #28a74520;
+    /* Dark mode light green */
+}
+
+body {
+    background: var(--grey);
+    overflow-x: hidden;
+    font-family: var(--lato);
+    /* Base font */
+}
+
+
+/* SIDEBAR */
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100%;
+    background: var(--light);
+    z-index: 2000;
+    transition: .3s ease;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+#sidebar::-webkit-scrollbar {
+    display: none;
+    /* Safari and Chrome */
+}
+
+#sidebar.hide {
+    width: 60px;
+}
+
+#sidebar .brand {
+    font-size: 24px;
+    font-weight: 700;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    color: var(--blue);
+    position: sticky;
+    top: 0;
+    left: 0;
+    background: var(--light);
+    z-index: 500;
+    padding: 0 0 20px 0;
+    /* Adjusted padding */
+    box-sizing: content-box;
+}
+
+#sidebar .brand .bx {
+    min-width: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Center icon vertically */
+    font-size: 28px;
+    /* Slightly larger icon */
+}
+
+#sidebar .brand .text {
+    display: inline-block;
+    /* Keep text visible */
+    transition: opacity 0.1s ease;
+    opacity: 1;
+}
+
+#sidebar.hide .brand .text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+#sidebar .side-menu {
+    width: 100%;
+    margin-top: 48px;
+    /* Space below brand */
+    padding: 0;
+    /* Remove default padding */
+}
+
+#sidebar .side-menu li {
+    height: 48px;
+    background: transparent;
+    margin-left: 6px;
+    border-radius: 48px 0 0 48px;
+    padding: 4px;
+    margin-bottom: 4px;
+    /* Add spacing between items */
+}
+
+#sidebar .side-menu li.active {
+    background: var(--grey);
+    position: relative;
+}
+
+
+/* Active indicator curves */
+
+#sidebar .side-menu li.active::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    top: -40px;
+    right: 0;
+    box-shadow: 20px 20px 0 var(--grey);
+    z-index: -1;
+}
+
+#sidebar .side-menu li.active::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    bottom: -40px;
+    right: 0;
+    box-shadow: 20px -20px 0 var(--grey);
+    z-index: -1;
+}
+
+#sidebar .side-menu li a {
+    width: 100%;
+    height: 100%;
+    background: var(--light);
+    display: flex;
+    align-items: center;
+    border-radius: 48px;
+    font-size: 16px;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow-x: hidden;
+    transition: color 0.3s ease, background 0.3s ease;
+    /* Add background transition */
+}
+
+#sidebar .side-menu.top li.active a {
+    color: var(--blue);
+    font-weight: 600;
+    /* Make active link bolder */
+}
+
+#sidebar.hide .side-menu li a {
+    width: calc(48px - (4px * 2));
+    transition: width .3s ease;
+    justify-content: center;
+    /* Center icon when hidden */
+}
+
+#sidebar.hide .side-menu li a .text {
+    display: none;
+    /* Hide text when sidebar is hidden */
+}
+
+#sidebar .side-menu li a.logout {
+    color: var(--red);
+}
+
+#sidebar .side-menu.top li a:hover {
+    color: var(--blue);
+}
+
+#sidebar .side-menu li a .bx {
+    min-width: calc(60px - ((4px + 6px) * 2));
+    /* Adjust icon width based on padding */
+    display: flex;
+    justify-content: center;
+    font-size: 20px;
+    /* Adjust icon size */
+}
+
+
+/* SIDEBAR */
+
+
+/* CONTENT */
+
+#content {
+    position: relative;
+    width: calc(100% - 280px);
+    left: 280px;
+    transition: .3s ease;
+}
+
+#sidebar.hide~#content {
+    width: calc(100% - 60px);
+    left: 60px;
+}
+
+
+/* NAVBAR */
+
+#content nav {
+    height: 56px;
+    background: var(--light);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    grid-gap: 24px;
+    font-family: var(--lato);
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    /* Add subtle shadow */
+}
+
+#content nav::before {
+    /* Curve effect */
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    bottom: -40px;
+    left: 0;
+    border-radius: 50%;
+    box-shadow: -20px -20px 0 var(--light);
+}
+
+#content nav a {
+    color: var(--dark);
+}
+
+#content nav .bx.bx-menu {
+    cursor: pointer;
+    color: var(--dark);
+    font-size: 24px;
+    /* Ensure menu icon is visible */
+}
+
+#content nav .nav-link {
+    font-size: 16px;
+    transition: .3s ease;
+    color: var(--dark-grey);
+    /* Subtler color */
+}
+
+#content nav .nav-link:hover {
+    color: var(--blue);
+}
+
+#content nav form {
+    max-width: 400px;
+    width: 100%;
+    margin-right: auto;
+}
+
+#content nav form .form-input {
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+
+#content nav form .form-input input {
+    flex-grow: 1;
+    padding: 0 16px;
+    height: 100%;
+    border: none;
+    background: var(--grey);
+    border-radius: 36px 0 0 36px;
+    outline: none;
+    width: 100%;
+    color: var(--dark);
+}
+
+body.dark #content nav form .form-input input {
+    background: var(--dark-grey);
+    /* Dark mode input background */
+}
+
+#content nav form .form-input button {
+    width: 36px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--blue);
+    color: var(--light);
+    font-size: 18px;
+    border: none;
+    outline: none;
+    border-radius: 0 36px 36px 0;
+    cursor: pointer;
+}
+
+#content nav .notification {
+    font-size: 20px;
+    position: relative;
+}
+
+#content nav .notification .num {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--light);
+    background: var(--red);
+    color: var(--light);
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#content nav .profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Space between name and icon/image */
+}
+
+#content nav .profile img {
+    /* Style if using image */
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+#content nav .profile .bx {
+    /* Style if using icon */
+    font-size: 36px;
+    color: var(--dark);
+}
+
+body.dark #content nav .profile .bx {
+    color: var(--light);
+}
+
+
+/* Switch Mode */
+
+#content nav .switch-mode {
+    display: block;
+    min-width: 50px;
+    height: 25px;
+    border-radius: 25px;
+    background: var(--dark-grey);
+    /* Use dark-grey for base */
+    cursor: pointer;
+    position: relative;
+}
+
+body.dark #content nav .switch-mode {
+    background: var(--grey);
+    /* Lighter grey in dark mode */
+}
+
+#content nav .switch-mode::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    bottom: 2px;
+    width: calc(25px - 4px);
+    background: var(--blue);
+    border-radius: 50%;
+    transition: all .3s ease;
+}
+
+#content nav #switch-mode:checked+.switch-mode::before {
+    left: calc(100% - (25px - 4px) - 2px);
+}
+
+
+/* NAVBAR */
+
+
+/* MAIN */
+
+#content main {
+    width: 100%;
+    padding: 36px 24px;
+    font-family: var(--poppins);
+    max-height: calc(100vh - 56px);
+    /* Ensure main content doesn't overflow viewport height */
+    overflow-y: auto;
+    /* Allow vertical scrolling */
+}
+
+#content main .head-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    grid-gap: 16px;
+    flex-wrap: wrap;
+}
+
+#content main .head-title .left h1 {
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+#content main .head-title .left .breadcrumb {
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+    padding: 0;
+    /* Remove default padding */
+}
+
+#content main .head-title .left .breadcrumb li {
+    color: var(--dark);
+    font-size: 14px;
+    /* Slightly smaller breadcrumb */
+}
+
+#content main .head-title .left .breadcrumb li a {
+    color: var(--dark-grey);
+    pointer-events: none;
+}
+
+#content main .head-title .left .breadcrumb li a.active {
+    color: var(--blue);
+    pointer-events: unset;
+    font-weight: 600;
+}
+
+#content main .head-title .btn-download {
+    /* General style for action buttons in header */
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 36px;
+    background: var(--blue);
+    color: var(--light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-gap: 10px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    border: none;
+    /* Ensure no border */
+}
+
+#content main .head-title .btn-download:hover {
+    background: #2a7dd8;
+    /* Slightly darker blue on hover */
+}
+
+
+/* Box Info Stats */
+
+#content main .box-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-gap: 24px;
+    margin-top: 36px;
+}
+
+#content main .box-info li {
+    padding: 24px;
+    background: var(--light);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    grid-gap: 24px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    /* Add subtle shadow */
+}
+
+#content main .box-info li .bx {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    font-size: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Colors for Box Info Icons */
+
+#content main .box-info li:nth-child(1) .bx {
+    background: var(--light-blue);
+    color: var(--blue);
+}
+
+#content main .box-info li:nth-child(2) .bx {
+    background: var(--light-yellow);
+    color: var(--yellow);
+}
+
+#content main .box-info li:nth-child(3) .bx {
+    background: var(--light-orange);
+    color: var(--orange);
+}
+
+
+/* Add more colors if needed */
+
+#content main .box-info li:nth-child(4) .bx {
+    background: var(--light-red);
+    color: var(--red);
+}
+
+
+/* Example */
+
+#content main .box-info li .text h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+#content main .box-info li .text p {
+    color: var(--dark);
+    opacity: 0.8;
+    /* Slightly lighter text */
+}
+
+
+/* Table Data / Main Content Sections */
+
+#content main .table-data {
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 24px;
+    margin-top: 24px;
+    width: 100%;
+    color: var(--dark);
+}
+
+#content main .table-data>div {
+    /* Direct children: .order, .todo, etc. */
+    border-radius: 20px;
+    background: var(--light);
+    padding: 24px;
+    overflow-x: auto;
+    /* Allow horizontal scroll on small screens */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    /* Add subtle shadow */
+    flex-grow: 1;
+    /* Allow children to grow */
+    flex-basis: 300px;
+    /* Default basis, adjust per section below */
+}
+
+#content main .table-data>div.full-width {
+    flex-basis: 100%;
+    /* Allow a section to take full width */
+}
+
+#content main .table-data .head {
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+    margin-bottom: 24px;
+}
+
+#content main .table-data .head h3 {
+    margin-right: auto;
+    font-size: 20px;
+    /* Adjusted heading size */
+    font-weight: 600;
+}
+
+#content main .table-data .head .bx {
+    cursor: pointer;
+    color: var(--dark-grey);
+}
+
+#content main .table-data .head .bx:hover {
+    color: var(--blue);
+}
+
+
+/* Order / Table Section */
+
+#content main .table-data .order {
+    flex-basis: 500px;
+    /* Minimum width before wrapping for tables */
+}
+
+#content main .table-data .order table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#content main .table-data .order table th {
+    padding-bottom: 12px;
+    font-size: 13px;
+    text-align: left;
+    border-bottom: 1px solid var(--grey);
+    font-weight: 600;
+    /* Bolder headers */
+    text-transform: uppercase;
+    /* Uppercase headers */
+    color: var(--dark-grey);
+}
+
+#content main .table-data .order table td {
+    padding: 14px 4px;
+    /* Slightly adjust padding */
+    vertical-align: middle;
+    /* Align cell content vertically */
+    font-size: 14px;
+    /* Ensure consistent font size */
+}
+
+#content main .table-data .order table tr td:first-child {
+    padding-left: 6px;
+}
+
+#content main .table-data .order table tr td:first-child p {
+    margin: 0;
+    /* Remove potential paragraph margin */
+}
+
+#content main .table-data .order table td img {
+    /* If using images */
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#content main .table-data .order table tbody tr:hover {
+    background: var(--grey);
+}
+
+
+/* Status Badges */
+
+#content main .table-data table tr td .status {
+    /* More specific selector */
+    font-size: 10px;
+    padding: 6px 16px;
+    color: var(--light);
+    border-radius: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+    /* Prevent wrapping */
+    display: inline-block;
+    /* Ensure padding works */
+}
+
+#content main .table-data table tr td .status.completed {
+    background: var(--blue);
+}
+
+#content main .table-data table tr td .status.process {
+    background: var(--yellow);
+    color: var(--dark);
+}
+
+
+/* Dark text on yellow */
+
+#content main .table-data table tr td .status.pending {
+    background: var(--orange);
+}
+
+#content main .table-data table tr td .status.danger {
+    background: var(--red);
+}
+
+
+/* Inventory Table Row Highlighting */
+
+#content main .table-data .order table tr.tr-near-expiry td {
+    color: var(--orange);
+    font-weight: 500;
+}
+
+#content main .table-data .order table tr.tr-expired td {
+    color: var(--red) !important;
+    /* Ensure text color override */
+    background-color: var(--light-red);
+    /* Use light red background */
+    font-weight: 500;
+}
+
+
+/* Todo / List Section */
+
+#content main .table-data .todo {
+    flex-basis: 300px;
+    /* Minimum width before wrapping for todo lists */
+}
+
+#content main .table-data .todo .todo-list {
+    width: 100%;
+    padding: 0;
+}
+
+#content main .table-data .todo .todo-list li {
+    width: 100%;
+    margin-bottom: 16px;
+    background: var(--grey);
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#content main .table-data .todo .todo-list li .bx {
+    cursor: pointer;
+}
+
+#content main .table-data .todo .todo-list li.completed {
+    border-left: 10px solid var(--blue);
+}
+
+#content main .table-data .todo .todo-list li.not-completed {
+    border-left: 10px solid var(--orange);
+}
+
+#content main .table-data .todo .todo-list li:last-child {
+    margin-bottom: 0;
+}
+
+
+/* Simple List Styling (for Rooms List) */
+
+.simple-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    /* Remove default margins */
+}
+
+.simple-list li {
+    display: flex;
+    align-items: center;
+    padding: 12px 6px;
+    /* Adjust padding */
+    border-bottom: 1px solid var(--grey);
+    font-size: 14px;
+}
+
+.simple-list li:last-child {
+    border-bottom: none;
+}
+
+.simple-list li i.bx {
+    /* Icon styling */
+    margin-right: 12px;
+    color: var(--blue);
+    font-size: 20px;
+}
+
+.simple-list li .room-info {
+    /* Text content */
+    flex-grow: 1;
+    color: var(--dark);
+}
+
+.simple-list li a.status {
+    /* Link/Button styling */
+    margin-left: auto;
+    text-decoration: none;
+    font-size: 10px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    color: var(--light);
+    /* Default text color */
+}
+
+
+/* Apply status colors */
+
+.simple-list li a.status.process {
+    background: var(--yellow);
+    color: var(--dark);
+}
+
+.simple-list li a.status.completed {
+    background: var(--blue);
+}
+
+.simple-list li a.status.pending {
+    background: var(--orange);
+}
+
+
+/* FORM CONTAINER STYLES (Integrated) */
+
+.form-container {
+    background: var(--light);
+    /* Match template bg */
+    padding: 24px;
+    border-radius: 10px;
+    /* Match template radius */
+    margin-top: 0;
+    /* Remove top margin if inside .order */
+    margin-bottom: 0;
+    /* Remove bottom margin if inside .order */
+}
+
+
+/* Specificity adjustment if needed when nested */
+
+.order>.form-container {
+    box-shadow: none;
+    /* Remove shadow if inside .order */
+    padding-top: 0;
+    /* Reduce padding if header is already present */
+}
+
+.form-container h3 {
+    /* Heading inside form container */
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    /* More space */
+    font-weight: 600;
+    color: var(--dark-grey);
+    /* Softer label color */
+    font-size: 14px;
+}
+
+.form-container input[type="text"],
+.form-container input[type="number"],
+.form-container textarea,
+.form-container select {
+    width: 100%;
+    padding: 10px 12px;
+    /* Adjust padding */
+    border: 1px solid var(--grey);
+    /* Use template border color */
+    border-radius: 5px;
+    background: var(--grey);
+    /* Use template input bg */
+    color: var(--dark);
+    box-sizing: border-box;
+    font-family: var(--lato);
+    /* Consistent font */
+    font-size: 14px;
+}
+
+.form-container textarea {
+    min-height: 80px;
+    /* Slightly taller textarea */
+}
+
+.form-container input:focus,
+.form-container select:focus,
+.form-container textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    /* Highlight focus */
+    background: var(--light);
+    /* Lighter background on focus */
+}
+
+
+/* Form Buttons */
+
+.form-container button {
+    /* General button style within form */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 10px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.form-container button[type="submit"] {
+    background-color: var(--blue);
+    color: var(--light);
+}
+
+.form-container button[type="submit"]:hover {
+    background-color: #2a7dd8;
+    /* Darker blue */
+}
+
+.form-container button[type="button"] {
+    /* Style for Cancel/Reset */
+    background-color: var(--dark-grey);
+    color: var(--dark);
+}
+
+body.dark .form-container button[type="button"] {
+    background-color: var(--grey);
+    color: var(--dark);
+}
+
+.form-container button[type="button"]:hover {
+    opacity: 0.8;
+}
+
+
+/* Alert Messages Styling */
+
+.alert {
+    padding: 12px 15px;
+    /* Adjust padding */
+    margin: 20px 0;
+    /* Add margin above/below */
+    border-radius: 5px;
+    border: 1px solid transparent;
+    font-size: 14px;
+}
+
+
+/* Ensure alerts have correct background in parent */
+
+.order>.alert,
+.guide-card>.alert {
+    margin-left: -24px;
+    /* Counteract parent padding */
+    margin-right: -24px;
+    margin-top: -24px;
+    /* If first element */
+    border-radius: 10px 10px 0 0;
+    /* Adjust radius if first */
+    margin-bottom: 24px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: var(--light-green);
+    border-color: #c3e6cb;
+}
+
+.alert-error {
+    color: #721c24;
+    background-color: var(--light-red);
+    border-color: #f5c6cb;
+}
+
+
+/* Inline Update Form (Inventory Page) */
+
+.update-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.update-form input[type="number"] {
+    width: 70px;
+    padding: 5px 8px;
+    font-size: 13px;
+    height: 30px;
+    text-align: center;
+    background: var(--grey);
+    border: 1px solid var(--dark-grey);
+    border-radius: 5px;
+    color: var(--dark);
+    box-sizing: border-box;
+    /* Include padding/border in width */
+    -moz-appearance: textfield;
+    /* Hide spinners Firefox */
+}
+
+.update-form input[type="number"]::-webkit-outer-spin-button,
+.update-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    /* Hide spinners Chrome/Safari */
+    margin: 0;
+}
+
+.update-form button {
+    height: 30px;
+    width: 30px;
+    /* Make button square */
+    padding: 0;
+    /* Remove padding */
+    font-size: 16px;
+    /* Adjust icon size */
+    background: var(--blue);
+    color: var(--light);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    /* Align icon center */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.update-form button:hover {
+    background: #2a7dd8;
+    /* Darker blue */
+}
+
+
+/* GUIDE CARD STYLES (Waste Segregation / Composting Guides) */
+
+.guide-card {
+    border-radius: 20px;
+    background: var(--light);
+    padding: 24px;
+    margin-bottom: 24px;
+    /* Space between cards if multiple used */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    color: var(--dark);
+}
+
+
+/* If placing inside .table-data > .order like other content blocks */
+
+.order>.guide-card {
+    margin-bottom: 0;
+    /* Remove margin if it's the only item */
+}
+
+.guide-card .head {
+    /* Optional header within the card */
+    display: flex;
+    align-items: center;
+    grid-gap: 16px;
+    margin-bottom: 20px;
+    /* Space below header */
+    padding-bottom: 10px;
+    /* Space */
+    border-bottom: 1px solid var(--grey);
+    /* Separator line */
+}
+
+.guide-card .head h2 {
+    margin: 0;
+    /* Reset margin */
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.guide-card .head .bx {
+    /* Icon in header */
+    font-size: 28px;
+    /* Larger icon */
+    color: var(--blue);
+    /* Default icon color */
+    min-width: 30px;
+    /* Ensure space for icon */
+}
+
+
+/* Color variations for guide card icons */
+
+.guide-card.general .head .bx {
+    color: var(--dark-grey);
+}
+
+.guide-card.compost .head .bx {
+    color: var(--green);
+}
+
+.guide-card.recycle .head .bx {
+    color: var(--blue);
+}
+
+.guide-card.landfill .head .bx {
+    color: var(--red);
+}
+
+.guide-card p {
+    /* Style paragraphs within card */
+    margin-bottom: 15px;
+    line-height: 1.6;
+    font-size: 14px;
+    color: var(--dark);
+    opacity: 0.9;
+}
+
+.guide-card p i {
+    /* Italic text styling */
+    opacity: 0.8;
+    font-size: 13px;
+}
+
+.guide-card ul {
+    padding-left: 25px;
+    /* Indent list */
+    list-style: disc;
+    /* Use standard bullets */
+    margin: 0 0 15px 0;
+    /* Margin below list */
+}
+
+.guide-card ul li {
+    margin-bottom: 10px;
+    /* Space between list items */
+    line-height: 1.6;
+    font-size: 14px;
+    color: var(--dark);
+    opacity: 0.9;
+}
+
+.guide-card ul li strong {
+    /* Highlighted terms */
+    font-weight: 600;
+    color: var(--dark);
+    /* Ensure strong text isn't too light */
+}
+
+.guide-card b {
+    /* Highlight DO NOT sections / Avoid */
+    color: var(--red);
+    font-weight: 600;
+}
+
+
+/* Dark Mode Adjustments for Form, Alerts, Guide Cards etc. */
+
+body.dark .form-container {
+    background: var(--dark-grey);
+}
+
+body.dark .form-container label {
+    color: var(--light);
+}
+
+body.dark .form-container input[type="text"],
+body.dark .form-container input[type="number"],
+body.dark .form-container textarea,
+body.dark .form-container select {
+    background: var(--dark);
+    border-color: var(--grey);
+    color: var(--light);
+}
+
+body.dark .form-container input:focus,
+body.dark .form-container select:focus,
+body.dark .form-container textarea:focus {
+    background: var(--grey);
+    border-color: var(--blue);
+}
+
+body.dark .update-form input[type="number"] {
+    background: var(--dark);
+    border-color: var(--grey);
+    color: var(--light);
+}
+
+body.dark .alert-success {
+    background-color: #15572440;
+    border-color: #c3e6cb80;
+    color: #d4edda;
+}
+
+body.dark .alert-error {
+    background-color: #721c2440;
+    border-color: #f5c6cb80;
+    color: #f8d7da;
+}
+
+body.dark .guide-card {
+    background: var(--grey);
+    /* Use dark mode grey for cards */
+    color: var(--dark);
+}
+
+body.dark .guide-card .head {
+    border-bottom-color: var(--dark-grey);
+}
+
+body.dark .guide-card .head h2 {
+    color: var(--dark);
+}
+
+
+/* Should be light in dark mode */
+
+body.dark .guide-card p,
+body.dark .guide-card ul li {
+    color: var(--dark);
+    opacity: 0.8;
+}
+
+body.dark .guide-card ul li strong {
+    color: var(--light);
+}
+
+body.dark .guide-card b {
+    color: var(--light-red);
+}
+
+
+/* Lighter red in dark mode */
+
+
+/* MAIN */
+
+
+/* CONTENT */
+
+
+/* RESPONSIVE */
+
+@media screen and (max-width: 768px) {
+    #sidebar {
+        width: 200px;
+    }
+    #content {
+        width: calc(100% - 60px);
+        /* Keep content width when sidebar is hidden */
+        left: 60px;
+        /* Match hidden sidebar width */
+    }
+    #sidebar:not(.hide)~#content {
+        /* Adjust when sidebar is visible */
+        width: calc(100% - 200px);
+        left: 200px;
+    }
+    #content nav .nav-link {
+        display: none;
+        /* Hide categories link */
+    }
+}
+
+@media screen and (max-width: 576px) {
+    #content nav form .form-input input {
+        display: none;
+        /* Hide search input by default */
+    }
+    #content nav form .form-input button {
+        width: auto;
+        height: auto;
+        background: transparent;
+        border-radius: none;
+        color: var(--dark);
+    }
+    body.dark #content nav form .form-input button {
+        /* Ensure reset icon color in dark mode */
+        color: var(--dark);
+    }
+    #content nav form.show .form-input input {
+        /* Show input when form has .show */
+        display: block;
+        width: 100%;
+    }
+    #content nav form.show .form-input button {
+        /* Style search button when form is shown */
+        width: 36px;
+        height: 100%;
+        border-radius: 0 36px 36px 0;
+        color: var(--light);
+        background: var(--red);
+        /* Close button style */
+    }
+    #content nav form.show~.notification,
+    #content nav form.show~.profile {
+        display: none;
+        /* Hide notification/profile when search is shown */
+    }
+    #content main .box-info {
+        grid-template-columns: 1fr;
+        /* Stack boxes vertically */
+    }
+    #content main .table-data>div {
+        /* Allow content blocks to stack */
+        flex-basis: 100% !important;
+        /* Force stacking on small screens */
+    }
+    #content main .table-data .head {
+        /* Ensure head elements don't shrink too much */
+        min-width: 300px;
+        /* Adjust as needed */
+    }
+    #content main .table-data .order table {
+        /* Ensure table is scrollable */
+        min-width: 420px;
+        /* Make inventory table wider for update form */
+    }
+    #content main .table-data .todo .todo-list {
+        /* Ensure todo list is scrollable */
+        min-width: 300px;
+        /* Adjust as needed */
+    }
+    #content main .table-data .form-container {
+        /* Allow form container to shrink */
+        min-width: unset;
+    }
+    #content main .guide-card {
+        /* Ensure guide card content is readable */
+        min-width: 300px;
+    }
+}

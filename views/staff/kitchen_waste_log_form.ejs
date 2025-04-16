@@ -1,83 +1,258 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css">
-    <title><%= title %></title>
-    <style>
-        .form-container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;}
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold;}
-        input[type="text"], input[type="number"], textarea, select {
-            width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
-        }
-        textarea { min-height: 60px; }
-        button { padding: 10px 15px; background-color: #337ab7; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;}
-        button:hover { background-color: #286090; }
-        .alert-error { color: red; margin-bottom: 15px; }
-    </style>
-</head>
-<body>
-     <%- include('../partials/header', { user: user }) %>
+<%# views/staff/kitchen_waste_log_form.ejs %>
 
-    <div class="form-container">
-        <h1><%= title %></h1>
+    <!DOCTYPE html>
+    <html lang="en">
 
-         <%# Display messages based on query parameters from redirects %>
-        <% if (locals.query && query.log_status === 'error') { %>
-            <p class="alert-error">Error: <%= query.message || 'Invalid input.' %></p>
-        <% } %>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <form action="/kitchen/waste/log" method="POST">
-             <div class="form-group">
-                <label for="waste_type">Waste Type:</label>
-                <select id="waste_type" name="waste_type" required>
-                    <option value="">-- Select Type --</option>
-                    <option value="prep_scrap">Preparation Scrap (Peels, Trimmings)</option>
-                    <option value="spoilage">Spoilage</option>
-                    <option value="plate_waste">Plate Waste (Post-consumer)</option>
-                    <option value="general">General Kitchen Waste</option>
-                </select>
-            </div>
+        <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+        <link rel="stylesheet" href="/kitchen/css/form.css">
+        <%# Path to your main CSS file %>
 
-             <div class="form-group">
-                <label for="food_item">Food Item (if applicable):</label>
-                <input type="text" id="food_item" name="food_item" placeholder="e.g., Carrots, Bread Loaf">
-            </div>
+            <title>
+                <%= title %>
+            </title>
+            <%# Dynamic Title from route %>
 
-            <div class="form-group" style="display: flex; gap: 10px;">
-                <div style="flex: 2;">
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" step="0.01" id="quantity" name="quantity" required placeholder="e.g., 1.5">
+                <%# NOTE: Ensure the form styling rules (.form-container, .form-group, etc.) %>
+                    <%# are included in your main /css/style.css file for consistency %>
+                        <%# You might need rules like this in style.css: %>
+                            <%#
+        .form-container { background: var(--light); padding: 24px; border-radius: 10px; /* Match template */ }
+        .form-container label { font-weight: 600; color: var(--dark-grey); margin-bottom: 8px; display: block;}
+        .form-container input, .form-container select, .form-container textarea { width: 100%; padding: 10px; border: 1px solid var(--grey); border-radius: 5px; background: var(--grey); color: var(--dark); box-sizing: border-box; margin-bottom: 15px; }
+        .form-container button[type="submit"] { padding: 10px 20px; background-color: var(--blue); color: var(--light); border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: background-color 0.3s ease; }
+        .form-container button[type="submit"]:hover { background-color: var(--dark-blue); }
+        .form-container .alert-error { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid transparent; }
+        .form-container .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid transparent; }
+        /* Add dark mode adjustments if needed */
+        body.dark .form-container { background: var(--dark-grey); }
+        body.dark .form-container label { color: var(--light); }
+        body.dark .form-container input, body.dark .form-container select, body.dark .form-container textarea { background: var(--dark); border-color: var(--grey); color: var(--light); }
+    %>
+
+    </head>
+
+    <body>
+
+        <section id="sidebar">
+            <a href="/kitchen/dashboard" class="brand">
+                <%# Link brand to Kitchen dashboard %>
+                    <i class='bx bxs-store-alt'></i>
+                    <%# Kitchen/Store Icon %>
+                        <span class="text">Staff Hub</span>
+                        <%# Or AdminHub %>
+            </a>
+            <%# Sidebar links relevant to Kitchen staff %>
+                <ul class="side-menu top">
+                    <li>
+                        <a href="/kitchen/dashboard">
+                            <i class='bx bxs-dashboard'></i>
+                            <span class="text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <%# Set active class for this page %>
+                            <a href="/kitchen/waste/log">
+                                <i class='bx bxs-trash-alt'></i>
+                                <%# Waste log icon %>
+                                    <span class="text">Log Kitchen Waste</span>
+                            </a>
+                    </li>
+                    <li>
+                        <a href="/kitchen/waste/audit">
+                            <i class='bx bxs-doughnut-chart'></i>
+                            <span class="text">Waste Audit Summary</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/kitchen/inventory">
+                            <i class='bx bxs-package'></i>
+                            <%# Inventory icon %>
+                                <span class="text">Manage Inventory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/kitchen/inventory/add">
+                            <i class='bx bx-plus-circle'></i>
+                            <%# Add Item Icon %>
+                                <span class="text">Add Inventory Item</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/kitchen/guides/segregation">
+                            <i class='bx bx-recycle'></i>
+                            <%# Segregation icon %>
+                                <span class="text">Waste Segregation Guide</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/kitchen/guides/composting">
+                            <i class='bx bxs-leaf'></i>
+                            <%# Composting icon %>
+                                <span class="text">Composting Guide</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/kitchen/recipes/scraps">
+                            <i class='bx bx-food-menu'></i>
+                            <%# Recipes icon %>
+                                <span class="text">Food Scrap Recipes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/kitchen/training">
+                            <i class='bx bxs-book-reader'></i>
+                            <%# Training icon %>
+                                <span class="text">View Training Materials</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="side-menu">
+                    <li>
+                        <a href="#"></a>
+                        <%# Settings Placeholder %>
+                    </li>
+                    <li>
+                        <a href="/logout" class="logout">
+                            <i class='bx bxs-log-out-circle'></i>
+                            <span class="text">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+        </section>
+        <section id="content">
+            <nav>
+                <i class='bx bx-menu'></i>
+                <a href="#" class="nav-link">Kitchen</a>
+                <%# Category hint %>
+                    <form action="#">
+                        <div class="form-input">
+                            <input type="search" placeholder="Search...">
+                            <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                        </div>
+                    </form>
+                    <input type="checkbox" id="switch-mode" hidden>
+                    <label for="switch-mode" class="switch-mode"></label>
+                    <a href="#" class="notification">
+                        <i class='bx bxs-bell'></i>
+                        <span class="num">0</span>
+                        <%# Dynamic? %>
+                    </a>
+                    <a href="#" class="profile">
+                        <span style="padding-right: 10px; vertical-align: middle;"><%= user ? user.username : 'User' %></span>
+                        <i class='bx bxs-user-circle' style="font-size: 36px; vertical-align: middle;"></i>
+                        <%# <img src="img/people.png"> %>
+                    </a>
+            </nav>
+            <main>
+                <div class="head-title">
+                    <div class="left">
+                        <h1>
+                            <%= title %>
+                        </h1>
+                        <%# Title from route %>
+                            <ul class="breadcrumb">
+                                <li>
+                                    <a href="#">Staff Area</a>
+                                </li>
+                                <li><i class='bx bx-chevron-right'></i></li>
+                                <li>
+                                    <a href="/kitchen/dashboard">Kitchen</a>
+                                </li>
+                                <li><i class='bx bx-chevron-right'></i></li>
+                                <li>
+                                    <a class="active" href="/kitchen/waste/log">Log Waste</a>
+                                </li>
+                            </ul>
+                    </div>
+                    <%# Download button likely not needed here %>
                 </div>
-                 <div style="flex: 1;">
-                    <label for="unit">Unit:</label>
-                     <input type="text" id="unit" name="unit" required placeholder="e.g., kg, items, liters">
-                </div>
-            </div>
 
-             <div class="form-group">
-                <label for="reason">Reason (Optional):</label>
-                <input type="text" id="reason" name="reason" placeholder="e.g., Expired, Over-preparation, Burnt">
-            </div>
+                <%# Removed the .box-info stats section as it's less relevant for a form page %>
 
-            <div class="form-group">
-                <label for="disposal_method">Disposal Method:</label>
-                <select id="disposal_method" name="disposal_method" required>
-                    <option value="">-- Select Disposal --</option>
-                    <option value="compost">Compost</option>
-                    <option value="donation">Donation</option>
-                    <option value="general_waste">General Waste</option>
-                     <option value="recycling">Recycling (e.g., packaging)</option>
-                </select>
-            </div>
+                    <%# Main content area for the form %>
+                        <div class="table-data">
+                            <%# Use table-data for consistent padding/layout %>
+                                <div class="order">
+                                    <%# Use .order for background/border-radius %>
+                                        <div class="head">
+                                            <h3>Enter Waste Details</h3>
+                                        </div>
 
-            <button type="submit">Log Waste</button>
-             <button type="button" onclick="window.location.href='/kitchen/dashboard'">Cancel</button>
-        </form>
-    </div>
+                                        <%# Form container using template styles %>
+                                            <div class="form-container">
 
-    <%- include('../partials/footer') %>
-</body>
-</html>
+                                                <%# Display status messages passed from the route (using logStatus, message) %>
+                                                    <% if (locals.logStatus === 'error') { %>
+                                                        <p class="alert-error">Error:
+                                                            <%= locals.message || 'Failed to log waste. Please check input.' %>
+                                                        </p>
+                                                        <% } else if (locals.logStatus === 'waste_success') { %>
+                                                            <%# Check for specific success status if needed from POST redirect %>
+                                                                <p class="alert-success">Waste logged successfully!</p>
+                                                                <% } %>
+
+                                                                    <form action="/kitchen/waste/log" method="POST">
+                                                                        <div class="form-group">
+                                                                            <label for="waste_type">Waste Type:</label>
+                                                                            <select id="waste_type" name="waste_type" required>
+                                    <option value="">-- Select Type --</option>
+                                    <option value="prep_scrap">Preparation Scrap (Peels, Trimmings)</option>
+                                    <option value="spoilage">Spoilage</option>
+                                    <option value="plate_waste">Plate Waste (Post-consumer)</option>
+                                    <option value="general">General Kitchen Waste</option>
+                                </select>
+                                                                        </div>
+
+                                                                        <div class="form-group">
+                                                                            <label for="food_item">Food Item (if applicable):</label>
+                                                                            <input type="text" id="food_item" name="food_item" placeholder="e.g., Carrots, Bread Loaf">
+                                                                        </div>
+
+                                                                        <div class="form-group" style="display: flex; flex-wrap: wrap; gap: 15px;">
+                                                                            <div style="flex: 2; min-width: 150px;">
+                                                                                <label for="quantity">Quantity:</label>
+                                                                                <input type="number" step="any" id="quantity" name="quantity" required placeholder="e.g., 1.5">
+                                                                            </div>
+                                                                            <div style="flex: 1; min-width: 100px;">
+                                                                                <label for="unit">Unit:</label>
+                                                                                <input type="text" id="unit" name="unit" required placeholder="e.g., kg, items, liters">
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="form-group">
+                                                                            <label for="reason">Reason (Optional):</label>
+                                                                            <input type="text" id="reason" name="reason" placeholder="e.g., Expired, Over-preparation, Burnt">
+                                                                        </div>
+
+                                                                        <div class="form-group">
+                                                                            <label for="disposal_method">Disposal Method:</label>
+                                                                            <select id="disposal_method" name="disposal_method" required>
+                                    <option value="">-- Select Disposal --</option>
+                                    <option value="compost">Compost</option>
+                                    <option value="donation">Donation</option>
+                                    <option value="general_waste">General Waste</option>
+                                    <option value="recycling">Recycling (e.g., packaging)</option>
+                                </select>
+                                                                        </div>
+
+                                                                        <button type="submit">Log Waste</button>
+                                                                        <%# The original cancel button redirects to kitchen dashboard %>
+                                                                            <button type="button" onclick="window.location.href='/kitchen/dashboard'" style="background-color: var(--dark-grey);">Cancel</button>
+                                                                    </form>
+                                            </div>
+                                            <%# End form-container %>
+                                </div>
+                                <%# End order div %>
+                        </div>
+                        <%# End table-data div %>
+
+            </main>
+        </section>
+        <script src="/kitchen/js/dashboard.js"></script>
+    </body>
+
+    </html>
