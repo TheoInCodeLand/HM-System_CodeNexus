@@ -1,75 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css">
-    <title><%= title %></title>
-    <style>
-        .section { margin-bottom: 20px; }
-        .room-list li, .log-list li { margin-bottom: 5px; }
-        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
-        .alert-success { background-color: #dff0d8; border: 1px solid #d6e9c6; color: #3c763d; }
-        .alert-error { background-color: #f2dede; border: 1px solid #ebccd1; color: #a94442; }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Boxicons -->
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<!-- My CSS -->
+	<link rel="stylesheet" href="/house-keeping/css/dashboard.css">
+
+	<title>AdminHub</title>
 </head>
 <body>
-    <%- include('../partials/header', { user: user }) %>
-
-    <h1><%= title %></h1>
-    <p>Welcome, <%= user.username %>.</p>
-
-    <%# Display messages based on query parameters from redirects %>
-    <% if (locals.query && query.log_status === 'success') { %>
-        <div class="alert alert-success">Log submitted successfully. <% if (query.room_update_status === 'attempted') { %> Room status update attempted. <% } else if (query.room_update_status === 'error') { %> Failed to update room status. <% } %></div>
-    <% } else if (locals.query && query.log_status === 'error') { %>
-        <div class="alert alert-error">Error submitting log. <%= query.message ? `(${query.message})` : '' %></div>
-    <% } %>
 
 
-    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+	<!-- SIDEBAR -->
+	<section id="sidebar">
+		<a href="#" class="brand">
+			<i class='bx bxs-smile'></i>
+			<span class="text"><%= user.username %>.</p></span>
+		</a>
+		<ul class="side-menu top">
+			<li class="active">
+				<a href="#">
+					<i class='bx bxs-dashboard' ></i>
+					<span class="text">Dashboard</span>
+				</a>
+			</li>
+			<li>
+				<a href="/housekeeping/supplies">
+					<i class='bx bxs-shopping-bag-alt' ></i>
+					<span class="text">HK Supplies</span>
+				</a>
+			</li>
+			<li>
+				<a href="/housekeeping/logs">
+					<i class='bx bxs-doughnut-chart' ></i>
+					<span class="text">Recent Logs</span>
+				</a>
+			</li>
+			<li>
+				<a href="#">
+					<i class='bx bxs-message-dots' ></i>
+					<span class="text">Tips</span>
+				</a>
+			</li>
+			
+		</ul>
+		<ul class="side-menu">
+			<li>
+				<a href="#">
+					<i class='bx bxs-cog' ></i>
+					<span class="text">Settings</span>
+				</a>
+			</li>
+			<li>
+				<a href="/auth/logout" class="logout">
+					<i class='bx bxs-log-out-circle' ></i>
+					<span class="text">Logout</span>
+				</a>
+			</li>
+		</ul>
+	</section>
+	<!-- SIDEBAR -->
 
-        <div class="section">
-            <h2>Rooms Needing Service</h2>
-            <% if (rooms && rooms.length > 0) { %>
-                <ul class="room-list">
-                    <% rooms.forEach(room => { %>
-                        <li>
-                            Room <%= room.room_number %> (<%= room.status %>) -
-                            <a href="/housekeeping/log/room/<%= room.id %>">Log Cleaning/Report</a>
-                        </li>
-                    <% }); %>
-                </ul>
-            <% } else { %>
-                <p>No rooms currently marked as needing service.</p>
-            <% } %>
-        </div>
-
-        <div class="section">
-            <h2>Your Recent Logs</h2>
-             <% if (recentLogs && recentLogs.length > 0) { %>
-                <ul class="log-list">
-                    <% recentLogs.forEach(log => { %>
-                        <li>
-                            <%= new Date(log.log_time).toLocaleString() %> - Room <%= log.room_number %>
-                            (Linen: <%= log.linen_changed ? 'Yes' : 'No' %>, Towels: <%= log.towels_changed ? 'Yes' : 'No' %>)
-                        </li>
-                    <% }); %>
-                </ul>
-                <p><a href="/housekeeping/logs">View All Logs</a></p>
-            <% } else { %>
-                <p>You haven't submitted any logs recently.</p>
-            <% } %>
-        </div>
-
-    </div>
-
-    <div class="section">
-        <h2>Other Actions</h2>
-        <p><a href="/housekeeping/supplies">Manage Supplies Stock</a></p>
-    </div>
 
 
-    <%- include('../partials/footer') %>
+	<!-- CONTENT -->
+	<section id="content">
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu' ></i>
+			<a href="#" class="nav-link">Categories</a>
+			<form action="#">
+				<%# Display messages based on query parameters from redirects %>
+                <% if (locals.query && query.log_status === 'success') { %>
+                    <div class="alert alert-success">Log submitted successfully. <% if (query.room_update_status === 'attempted') { %> Room status update attempted. <% } else if (query.room_update_status === 'error') { %> Failed to update room status. <% } %></div>
+                <% } else if (locals.query && query.log_status === 'error') { %>
+                    <div class="alert alert-error">Error submitting log. <%= query.message ? `(${query.message})` : '' %></div>
+                <% } %>
+			</form>
+			<input type="checkbox" id="switch-mode" hidden>
+			<label for="switch-mode" class="switch-mode"></label>
+			<a href="/auth/logout" class="notification" style="display: flex; align-items: center; gap: 0.2em;">
+				<i class="fa-solid fa-arrow-right-from-bracket"></i>
+				<small>Logout</small>
+			</a>
+			<!-- <a href="#" class="profile">
+				<img src="img/people.png">
+			</a> -->
+		</nav>
+		<!-- NAVBAR -->
+
+		<!-- MAIN -->
+		<main>
+			<div class="head-title">
+				<div class="left">
+					<h1>Housekeeping Dashboard</h1>
+					<ul class="breadcrumb">
+						<li>
+							<a href="#">Dashboard</a>
+						</li>
+						<li><i class='bx bx-chevron-right' ></i></li>
+						<li>
+							<a class="active" href="/">Home</a>
+						</li>
+					</ul>
+				</div>
+				<a href="/housekeeping/supplies" class="btn-download">
+					<i class="fa-solid fa-boxes-packing"></i><span class="text">Manage Stock</span>
+				</a>
+			</div>
+
+			<ul class="box-info">
+				<li>
+					<i class='bx bxs-calendar-check' ></i>
+					<span class="text">
+						<h3>1020</h3>
+						<p>Total Logs</p>
+					</span>
+				</li>
+				<li>
+					<i class='bx bxs-group' ></i>
+					<span class="text">
+						<h3>2834</h3>
+						<p>Opt-out Linen</p>
+					</span>
+				</li>
+				<li>
+					<i class='bx bxs-dollar-circle' ></i>
+					<span class="text">
+						<h3>$2543</h3>
+						<p>Opt-out Linen</p>
+					</span>
+				</li>
+			</ul>
+
+			<div class="table-data">
+				<div class="order">
+					<div class="head">
+						<h3>Rooms Needing Service</h3>
+						<i class="fa-solid fa-hand-sparkles"></i>
+						<i class="fa-solid fa-broom-ball"></i>	
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>Room Number</th>
+								<th>Room Status</th>
+								<th>Log Cleaning/ Report</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <% if (rooms && rooms.length > 0) { %>
+                            <!-- LOOP START -->
+                            <% rooms.forEach(room => { %>
+                                <tr>
+                                    <td>
+                                        <img src="https://static.vecteezy.com/system/resources/previews/010/747/542/original/living-room-icon-design-free-vector.jpg">
+                                        <p>Room <%= room.room_number %> (Tfokomala)</p>
+                                    </td>
+                                    <td><%= room.status %></td>
+                                    <td><a href="/housekeeping/log/room/<%= room.id %>"><span class="status completed">Report</span></a></td>
+                                </tr>
+                            <% }); %>
+                            <!-- LOOP END -->
+                            <% } else { %>
+                                <p>No rooms currently marked as needing service!</p>
+                            <% } %>
+							
+						</tbody>
+					</table>
+				</div>
+				<div class="todo">
+					<div class="head">
+						<h3>Recent Logs</h3>
+						<i class='bx bx-plus' ></i>
+						<i class='bx bx-filter' ></i>
+					</div>
+					<ul class="todo-list">
+                        <% if (recentLogs && recentLogs.length > 0) { %>
+                        <!-- LOOP START -->
+                            <% recentLogs.forEach(log => { %>
+                                <li class="completed">
+                                    <p><i class="fa-solid fa-calendar"></i>: <%= new Date(log.log_time).toLocaleString() %> --- Room <%= log.room_number %> (Linen: <%= log.linen_changed ? 'Yes' : 'No' %>, Towels: <%= log.towels_changed ? 'Yes' : 'No' %>)</p>
+                                    <i class='bx bx-dots-vertical-rounded' ></i>
+                                </li>
+                            <% }); %>
+                        <!-- LOOP END -->
+						<% } else { %>
+                            <p>You haven't submitted any logs recently.</p>
+                        <% } %>
+					</ul>
+				</div>
+			</div>
+		</main>
+		<!-- MAIN -->
+	</section>
+	<!-- CONTENT -->
+	
+
+	<script src="/house-keeping/js/script.js"></script>
 </body>
 </html>
