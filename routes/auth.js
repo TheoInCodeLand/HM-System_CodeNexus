@@ -14,7 +14,7 @@ router.post('/register', (req, res) => {
     if (password !== confirm_password) {
         return res.render('auth/register', { title: 'Register', error: 'Passwords do not match.' });
     }
-    
+
     const allowedRoles = ['guest', 'housekeeping', 'maintenance', 'kitchen', 'admin'];
     if (!allowedRoles.includes(role)) {
         return res.render('auth/register', { title: 'Register', error: 'Invalid role selected.' });
@@ -58,7 +58,7 @@ router.post('/login', (req, res) => {
     if (!username || !password) {
         return res.render('auth/login', { title: 'Login', error: 'Please enter username and password.' });
     }
-    
+
     const sql = `SELECT id, username, password, role FROM users WHERE username = ?`;
     db.get(sql, [username], (err, user) => {
         if (err) {
@@ -69,7 +69,7 @@ router.post('/login', (req, res) => {
         if (!user) {
             return res.render('auth/login', { title: 'Login', error: 'user does not exist' });
         }
-        
+
         bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) {
                 console.error("Error comparing passwords:", err.message);
@@ -91,10 +91,16 @@ router.post('/login', (req, res) => {
                         res.redirect('/guest/dashboard'); // Example guest dashboard route
                         break;
                     case 'admin':
+                        res.redirect('/admin/rooms'); // Example guest dashboard route
+                        break;
                     case 'housekeeping':
+                        res.redirect('/housekeeping/dashboard'); // Example guest dashboard route
+                        break;
                     case 'maintenance':
+                        res.redirect('/maintenance/dashboard'); // Example guest dashboard route
+                        break;
                     case 'kitchen':
-                        res.redirect('/housekeeping/dashboard'); // Example generic staff dashboard route
+                        res.redirect('/kitchen/dashboard'); // Example generic staff dashboard route
                         break;
                     default:
                         res.redirect('/');
