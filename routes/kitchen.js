@@ -14,215 +14,322 @@ function ensureKitchenStaff(req, res, next) {
 }
 router.use(ensureKitchenStaff);
 
-// --- GET /kitchen/dashboard (keep as is) ---
+// --- GET /kitchen/dashboard ---
 router.get('/dashboard', (req, res) => {
-    // ... (dashboard logic remains unchanged) ...
     const today = new Date().toISOString().split('T')[0];
-    const nearExpirySql = `SELECT id, item_name, quantity, unit, expiry_date
-                           FROM inventory_items
-                           WHERE expiry_date IS NOT NULL AND expiry_date >= ?
-                           ORDER BY expiry_date ASC LIMIT 5`;
-    const collectionSql = `SELECT waste_type, collection_day, collection_time, next_collection_due
-                           FROM waste_collection_schedules
-                           ORDER BY next_collection_due ASC`;
+    const { log_status, message } = req.query;
 
+    // --- SQL Queries ---
+    const nearExpirySql = `SELECT id, item_name, quantity, unit, expiry_date FROM inventory_items WHERE expiry_date IS NOT NULL AND expiry_date >= ? ORDER BY expiry_date ASC LIMIT 5`;
+    const collectionSql = `SELECT waste_type, collection_day, collection_time, next_collection_due FROM waste_collection_schedules ORDER BY next_collection_due ASC`;
+    const recentWasteSql = `SELECT log_id, log_time, waste_type, food_item, quantity, unit FROM kitchen_waste_logs ORDER BY log_time DESC LIMIT 5`;
+    const weeklyWasteSummarySql = `SELECT waste_type, SUM(quantity) as total_quantity, unit FROM kitchen_waste_logs WHERE log_time >= date('now', '-7 days') GROUP BY waste_type, unit ORDER BY total_quantity DESC`;
+
+    // *** UPDATED Low Stock SQL based on quantity <= 5 ***
+    const lowStockSql = `SELECT id, item_name, quantity, unit FROM inventory_items WHERE quantity <= 5 ORDER BY item_name ASC LIMIT 5`; // Changed condition here
+
+    // --- Fetch Data using Promise.all ---
     Promise.all([
+            // Promise 1: Near Expiry
             new Promise((resolve, reject) => {
                 db.all(nearExpirySql, [today], (err, items) => {
                     if (err) return reject(`Error fetching near expiry items: ${err.message}`);
-                    resolve(items);
+                    resolve(items || []);
                 });
             }),
+            // Promise 2: Collection Schedules
             new Promise((resolve, reject) => {
                 db.all(collectionSql, [], (err, schedules) => {
                     if (err) return reject(`Error fetching collection schedules: ${err.message}`);
-                    resolve(schedules);
+                    resolve(schedules || []);
+                });
+            }),
+            // Promise 3: Recent Waste Logs
+            new Promise((resolve, reject) => {
+                db.all(recentWasteSql, [], (err, logs) => {
+                    if (err) return reject(`Error fetching recent waste logs: ${err.message}`);
+                    resolve(logs || []);
+                });
+            }),
+            // Promise 4: Weekly Waste Summary
+            new Promise((resolve, reject) => {
+                db.all(weeklyWasteSummarySql, [], (err, summary) => {
+                    if (err) return reject(`Error fetching weekly waste summary: ${err.message}`);
+                    resolve(summary || []);
+                });
+            }),
+            // Promise 5: Low Stock Items (using updated definition)
+            new Promise((resolve, reject) => {
+                db.all(lowStockSql, [], (err, items) => { // Uses the updated lowStockSql query
+                    if (err) {
+                        console.error("Error fetching low stock items:", err.message); // Log full error
+                        // Return empty array to avoid crashing, but log the error
+                        return resolve([]);
+                        // Alternatively, reject if low stock is critical:
+                        // return reject(`Error fetching low stock items: ${err.message}`);
+                    }
+                    resolve(items || []);
                 });
             })
         ])
-        .then(([nearExpiryItems, collectionSchedules]) => {
+        .then(([nearExpiryItems, collectionSchedules, recentWasteLogs, wasteSummaryData, lowStockItems]) => {
+            // --- Render the dashboard ---
             res.render('staff/kitchen_dashboard', {
                 title: 'Kitchen Dashboard',
                 user: req.session.user,
                 nearExpiryItems: nearExpiryItems,
-                collectionSchedules: collectionSchedules
-                    // *** Add logic here later if kitchen dashboard needs its own status messages ***
-                    // logStatus: req.query.log_status,
-                    // message: req.query.message
+                collectionSchedules: collectionSchedules,
+                recentWasteLogs: recentWasteLogs,
+                wasteSummaryData: wasteSummaryData,
+                lowStockItems: lowStockItems, // Pass the fetched low stock items (now based on quantity <= 5)
+                logStatus: log_status,
+                message: message
             });
         })
         .catch(error => {
             console.error("Error loading kitchen dashboard:", error);
-            res.redirect('/');
+            res.status(500).send("Error loading kitchen dashboard data.");
         });
 });
+// --- ***** END OF UPDATED DASHBOARD ROUTE ***** ---
 
 
-// --- Waste Logging Routes ---
-
-// GET /kitchen/waste/log - Display form to log waste (This route might become less used if form is embedded elsewhere)
+// --- Waste Logging Routes (Keep as is, except for removing duplicate POST below) ---
 router.get('/waste/log', (req, res) => {
-    // Pass potential error messages if redirected here
     const { log_status, message } = req.query;
+    // Assuming your render call has necessary parameters
     res.render('staff/kitchen_waste_log_form', {
         title: 'Log Kitchen Waste',
         user: req.session.user,
-        logStatus: log_status, // Pass status to the template
-        message: message // Pass message to the template
+        logStatus: log_status,
+        message: message
     });
 });
 
-// ***** MODIFIED SECTION *****
-// POST /kitchen/waste/log - Handle waste log submission
 router.post('/waste/log', (req, res) => {
-    const staffUserId = req.session.user.id;
+    // Using the version that redirects to kitchen dashboard
+    const staffUserId = req.session.user.id; // Make sure staffUserId is used in the SQL if needed
     const { waste_type, food_item, quantity, unit, reason, disposal_method } = req.body;
 
-    // Basic Validation
-    if (!waste_type || !quantity || !unit || !disposal_method) {
-        console.error("Invalid input for kitchen waste log:", req.body);
-        // *** MODIFIED REDIRECT: Redirect back to Housekeeping Dashboard on validation error ***
-        // Use URL encoding for the message
-        const message = encodeURIComponent('Invalid input. Please fill all required fields.');
-        return res.redirect(`/housekeeping/dashboard?kitchen_log_status=error&kitchen_message=${message}`);
+    if (!waste_type || !quantity || !unit || !disposal_method || quantity <= 0) { // Added quantity > 0 check
+        const message = encodeURIComponent('Invalid input. Waste type, positive quantity, unit, and disposal method are required.');
+        // Redirect back to the form or dashboard with error
+        // Choose one: redirect back to form or dashboard
+        // Option 1: Redirect back to form
+        // return res.redirect(`/kitchen/waste/log?log_status=error&message=${message}`);
+        // Option 2: Redirect to dashboard
+        return res.redirect(`/kitchen/dashboard?log_status=error&message=${message}`);
     }
 
     const sql = `INSERT INTO kitchen_waste_logs
-                 (staff_user_id, waste_type, food_item, quantity, unit, reason, disposal_method)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
+                 (staff_user_id, waste_type, food_item, quantity, unit, reason, disposal_method, log_time)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`;
+    // Ensure parameter order matches SQL statement
     db.run(sql, [staffUserId, waste_type, food_item || null, quantity, unit, reason || null, disposal_method], function(err) {
         if (err) {
-            console.error("Error inserting kitchen waste log:", err.message);
-            // *** MODIFIED REDIRECT: Redirect back to Housekeeping Dashboard on insert error ***
-            const message = encodeURIComponent('Database error occurred while saving the log.');
-            res.redirect(`/housekeeping/dashboard?kitchen_log_status=error&kitchen_message=${message}`);
+            console.error("Error logging kitchen waste:", err.message);
+            const message = encodeURIComponent('Database error occurred while logging waste.');
+            // Redirect to dashboard with error message
+            res.redirect(`/kitchen/dashboard?log_status=db_error&message=${message}`);
         } else {
-            console.log(`New kitchen waste log created with ID ${this.lastID} by user ${staffUserId}`);
-            // *** MODIFIED REDIRECT: Redirect back to Housekeeping Dashboard on success ***
+            console.log(`Kitchen waste logged with ID ${this.lastID}`);
             const message = encodeURIComponent('Kitchen waste logged successfully!');
-            res.redirect(`/housekeeping/dashboard?kitchen_log_status=success&kitchen_message=${message}`);
+            res.redirect(`/kitchen/dashboard`); // Redirect to kitchen dashboard
         }
     });
 });
-// ***** END OF MODIFIED SECTION *****
-
+// ***** END OF WASTE LOGGING SECTION *****
 
 // GET /kitchen/waste/audit (keep as is)
 router.get('/waste/audit', (req, res) => {
-    // ... (audit logic remains unchanged) ...
     const sql = `SELECT waste_type, disposal_method, SUM(quantity) as total_quantity, unit
-                  FROM kitchen_waste_logs
-                  WHERE log_time >= date('now', '-7 days')
-                  GROUP BY waste_type, disposal_method, unit
-                  ORDER BY waste_type, disposal_method`;
+                 FROM kitchen_waste_logs
+                 WHERE log_time >= date('now', '-7 days')
+                 GROUP BY waste_type, disposal_method, unit
+                 ORDER BY waste_type, disposal_method`;
 
     db.all(sql, [], (err, auditData) => {
         if (err) {
             console.error("Error fetching waste audit data:", err.message);
-            return res.redirect('/kitchen/dashboard');
+            // Redirect to dashboard with an error message if needed, or just render with empty data
+            res.render('staff/kitchen_waste_audit', {
+                title: 'Weekly Waste Audit Summary',
+                user: req.session.user,
+                auditData: [], // Send empty array on error
+                errorMessage: "Could not load waste audit data."
+            });
+            // return res.redirect('/kitchen/dashboard'); // Alternative: Redirect
+        } else {
+            res.render('staff/kitchen_waste_audit', {
+                title: 'Weekly Waste Audit Summary',
+                user: req.session.user,
+                auditData: auditData
+            });
         }
-        res.render('staff/kitchen_waste_audit', {
-            title: 'Weekly Waste Audit Summary',
-            user: req.session.user,
-            auditData: auditData
-        });
     });
 });
 
 
-// --- Inventory Management Routes (keep as is) ---
-// GET /kitchen/inventory
-// GET /kitchen/inventory/add
-// POST /kitchen/inventory/add
-// POST /kitchen/inventory/update/:itemId
-// ... (inventory routes remain unchanged) ...
+// --- Inventory Management Routes ---
+
+// *** UPDATED GET /kitchen/inventory route to add stock_status ***
 router.get('/inventory', (req, res) => {
-    const { update_status, status, message } = req.query; // Read query params for status messages
-    const sql = `SELECT id, item_name, category, quantity, unit, expiry_date
-                 FROM inventory_items
-                 ORDER BY category, item_name ASC`;
+    const { update_status, status, message } = req.query;
+    const sql = `SELECT id, item_name, category, quantity, unit, expiry_date, reorder_level, last_updated
+                 FROM inventory_items ORDER BY category, item_name ASC`; // Added last_updated
+
     db.all(sql, [], (err, items) => {
         if (err) {
-            console.error("Error fetching inventory:", err.message);
-            return res.redirect('/kitchen/dashboard');
+            console.error("Error fetching inventory list:", err.message);
+            // Render the page with an error message and empty list
+            return res.render('staff/kitchen_inventory_list', {
+                title: 'Kitchen Inventory',
+                user: req.session.user,
+                items: [], // Send empty array on error
+                errorMessage: 'Failed to load inventory items.',
+                updateStatus: update_status,
+                addStatus: status,
+                message: message
+            });
         }
+
+        // *** Add stock_status logic here ***
+        const itemsWithStatus = items.map(item => {
+            let stockStatus;
+            if (item.quantity === null || item.quantity === undefined) {
+                stockStatus = 'Unknown'; // Handle cases where quantity might be null
+            } else if (item.quantity <= 5) {
+                stockStatus = 'Low Stock';
+            } else {
+                stockStatus = 'Normal';
+            }
+            return {
+                ...item, // Spread existing item properties
+                stock_status: stockStatus // Add the new status property
+            };
+        });
+        // *** End of stock_status logic ***
+
         res.render('staff/kitchen_inventory_list', {
             title: 'Kitchen Inventory',
             user: req.session.user,
-            items: items,
-            updateStatus: update_status, // Pass status for update actions
-            addStatus: status, // Pass status for add actions
-            message: message // Pass general messages
+            items: itemsWithStatus, // Pass the array with the added status
+            updateStatus: update_status,
+            addStatus: status,
+            message: message,
+            errorMessage: null // No error if we reached here
         });
     });
 });
+// *** END OF UPDATED GET /kitchen/inventory route ***
+
 router.get('/inventory/add', (req, res) => {
     const { status, message } = req.query;
     res.render('staff/kitchen_inventory_form', {
         title: 'Add Inventory Item',
         user: req.session.user,
-        item: null,
+        item: null, // No existing item for add form
         form_action: '/kitchen/inventory/add',
         status: status,
         message: message
     });
 });
+
+// *** KEEPS the updated POST /inventory/add route that includes reorder_level ***
 router.post('/inventory/add', (req, res) => {
-    const { item_name, category, quantity, unit, expiry_date } = req.body;
-    if (!item_name || quantity === undefined || !unit) {
+    // Destructure reorder_level from req.body
+    const { item_name, category, quantity, unit, expiry_date, reorder_level } = req.body;
+
+    // Validate required fields and quantity > 0
+    if (!item_name || quantity === undefined || quantity === '' || !unit || parseFloat(quantity) < 0) {
         console.error("Invalid input for new inventory item:", req.body);
-        const message = encodeURIComponent('Invalid input. Name, quantity, and unit required.');
+        const message = encodeURIComponent('Invalid input. Name, non-negative quantity, and unit required.');
         return res.redirect(`/kitchen/inventory/add?status=error&message=${message}`);
     }
-    const sql = `INSERT INTO inventory_items (item_name, category, quantity, unit, expiry_date) VALUES (?, ?, ?, ?, ?)`;
-    db.run(sql, [item_name, category || null, quantity, unit, expiry_date || null], function(err) {
+
+    // Validate reorder_level if provided (must be non-negative number)
+    let reorderLevelValue = null;
+    if (reorder_level !== undefined && reorder_level !== '') {
+        if (isNaN(parseFloat(reorder_level)) || parseFloat(reorder_level) < 0) {
+            const message = encodeURIComponent('Invalid input. Reorder level must be a non-negative number.');
+            return res.redirect(`/kitchen/inventory/add?status=error&message=${message}`);
+        }
+        reorderLevelValue = parseFloat(reorder_level);
+    }
+
+
+    const sql = `INSERT INTO inventory_items
+                 (item_name, category, quantity, unit, expiry_date, reorder_level, last_updated)
+                 VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`; // Added reorder_level placeholder and last_updated
+
+    db.run(sql, [
+        item_name,
+        category || null,
+        parseFloat(quantity), // Ensure quantity is stored as a number
+        unit,
+        expiry_date || null,
+        reorderLevelValue // Use the validated or null value
+    ], function(err) {
         if (err) {
             console.error("Error adding inventory item:", err.message);
-            const message = encodeURIComponent('Database error or item already exists.');
+            // Check for unique constraint error (example: UNIQUE constraint failed: inventory_items.item_name)
+            const message = encodeURIComponent(err.message.includes('UNIQUE constraint') ? 'Item name already exists.' : 'Database error occurred.');
             return res.redirect(`/kitchen/inventory/add?status=error&message=${message}`);
         }
         console.log(`New inventory item added with ID ${this.lastID}`);
         const message = encodeURIComponent('Item added successfully!');
-        res.redirect(`/kitchen/inventory?status=added_success&message=${message}`); // Redirect to inventory list
+        // Redirect to inventory list with success message
+        res.redirect(`/kitchen/inventory?status=added_success&message=${message}`);
     });
 });
+// *** END OF UPDATED POST /inventory/add route ***
+
+// --- REMOVED the duplicate, simpler POST /inventory/add route ---
+
+// POST /kitchen/inventory/update/:itemId (keep as is, maybe add validation for negative result?)
 router.post('/inventory/update/:itemId', (req, res) => {
     const itemId = req.params.itemId;
     const { change_amount } = req.body;
 
-    if (change_amount === undefined || isNaN(parseInt(change_amount))) {
+    // Validate input: change_amount must be a valid number (can be negative)
+    if (change_amount === undefined || change_amount === '' || isNaN(parseFloat(change_amount))) {
         console.error("Invalid input for inventory update:", req.body);
-        const message = encodeURIComponent('Invalid change amount provided.');
-        return res.redirect(`/kitchen/inventory?update_status=error&message=${message}`);
+        const message = encodeURIComponent('Invalid change amount provided. Please enter a number.');
+        return res.redirect(`/kitchen/inventory?update_status=error&message=${message}&itemId=${itemId}`); // Redirect back to list
     }
-    const amount = parseInt(change_amount);
+
+    const amount = parseFloat(change_amount);
+
+    // Optional: Check if the update would result in a negative quantity (depends on business logic)
+    // db.get('SELECT quantity FROM inventory_items WHERE id = ?', [itemId], (err, item) => {
+    //     if (err) { /* handle error */ }
+    //     if (!item) { /* handle not found */ }
+    //     if (item.quantity + amount < 0) {
+    //          const message = encodeURIComponent(`Update failed: Cannot have negative stock for item ID ${itemId}.`);
+    //          return res.redirect(`/kitchen/inventory?update_status=negative_stock&message=${message}&itemId=${itemId}`);
+    //     }
+    // If check passes, proceed with the update
     const sql = `UPDATE inventory_items SET quantity = quantity + ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?`;
     db.run(sql, [amount, itemId], function(err) {
         if (err) {
             console.error(`Error updating inventory ${itemId}:`, err.message);
             const message = encodeURIComponent('Database error during update.');
-            return res.redirect(`/kitchen/inventory?update_status=db_error&message=${message}`);
+            return res.redirect(`/kitchen/inventory?update_status=db_error&message=${message}&itemId=${itemId}`);
         }
         if (this.changes === 0) {
             console.error(`Inventory item ${itemId} not found for update.`);
             const message = encodeURIComponent(`Item ID ${itemId} not found.`);
             return res.redirect(`/kitchen/inventory?update_status=not_found&message=${message}`);
         }
-        console.log(`Updated stock for inventory ID ${itemId} by ${amount}.`);
+        console.log(`Updated stock for inventory ID ${itemId} by ${amount}. New quantity calculated in DB.`);
         const message = encodeURIComponent(`Stock for item ID ${itemId} updated successfully.`);
         res.redirect(`/kitchen/inventory?update_status=success&message=${message}`);
     });
+    // }); // End of optional negative check wrapper
 });
 
 
 // --- Information & Resource Routes (keep as is) ---
-// GET /kitchen/guides/segregation
-// GET /kitchen/guides/composting
-// GET /kitchen/facilities
-// GET /kitchen/recipes/scraps
-// GET /kitchen/training
-// ... (guide/resource routes remain unchanged) ...
 router.get('/guides/segregation', (req, res) => {
     res.render('staff/kitchen_guide_segregation', {
         title: 'Waste Segregation Guide',
